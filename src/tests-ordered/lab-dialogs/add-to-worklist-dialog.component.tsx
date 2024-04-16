@@ -262,6 +262,15 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
                         setSelectedReferral(event.target.value)
                       }
                     >
+                      {!selectedReferral ? (
+                        <SelectItem
+                          text={t(
+                            "selectAreferelPoint",
+                            "Select a referal point"
+                          )}
+                          value=""
+                        />
+                      ) : null}
                       {referrals.map((referral) => (
                         <SelectItem
                           key={referral.uuid}
