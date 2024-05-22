@@ -79,10 +79,14 @@ const ReferredOrdersList: React.FC = () => {
           {entry?.patient?.display.split("-")[1]}
         </ConfigurableLink>
       ),
-      artNumber: entry.patient?.identifiers.find(
-        (item) =>
-          item?.identifierType?.uuid === "e1731641-30ab-102d-86b0-7a5022ba4115"
-      ).display,
+      artNumber: entry.patient?.identifiers
+        .find(
+          (item) =>
+            item?.identifierType?.uuid ===
+            "e1731641-30ab-102d-86b0-7a5022ba4115"
+        )
+        .display.split("=")[1]
+        .trim(),
       orderNumber: entry?.orderNumber,
       accessionNumber: entry?.accessionNumber,
       test: entry?.concept?.display,

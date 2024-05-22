@@ -113,23 +113,23 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
     { id: 8, header: t("actions", "Actions"), key: "actions" },
   ];
 
-  const ResultsOrder: React.FC<ResultsOrderProps> = ({
-    order,
-    patientUuid,
-  }) => {
-    return (
-      <Button
-        kind="ghost"
-        onClick={() => {
-          launchOverlay(
-            t("resultForm", "Lab results form"),
-            <ResultForm patientUuid={patientUuid} order={order} />
-          );
-        }}
-        renderIcon={(props) => <Microscope size={16} {...props} />}
-      />
-    );
-  };
+  const ResultsOrder = useCallback(
+    ({ order, patientUuid }) => {
+      return (
+        <Button
+          kind="ghost"
+          onClick={() => {
+            launchOverlay(
+              t("resultForm", "Lab results form"),
+              <ResultForm patientUuid={patientUuid} order={order} />
+            );
+          }}
+          renderIcon={(props) => <Microscope size={16} {...props} />}
+        />
+      );
+    },
+    [t]
+  );
 
   const tableRows = useMemo(() => {
     return paginatedWorkListEntries.map((entry, index) => ({

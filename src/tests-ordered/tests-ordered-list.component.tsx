@@ -66,43 +66,49 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
   ];
 
   const tableRows = useMemo(() => {
-    return paginatedPickedOrderQueueEntries.map((entry, index) => ({
-      ...entry,
-      id: entry?.uuid,
-      date: (
-        <span className={styles["single-line-display"]}>
-          {formatDate(parseDate(entry?.dateActivated))}
-        </span>
-      ),
-      patient: entry?.patient?.display.split("-")[1],
-      artNumber: entry.patient?.identifiers.find(
-        (item) =>
-          item?.identifierType?.uuid === "e1731641-30ab-102d-86b0-7a5022ba4115"
-      ).display,
-      orderNumber: entry?.orderNumber,
-      test: entry?.concept?.display,
-      action: entry?.action,
-      orderer: entry?.orderer?.display,
-      urgency: entry?.urgency,
-      actions: (
-        <OrderCustomOverflowMenuComponent
-          menuTitle={
-            <>
-              <OverflowMenuVertical
-                size={16}
-                style={{ marginLeft: "0.3rem" }}
-              />
-            </>
-          }
-        >
-          <ExtensionSlot
-            className={styles.menuLink}
-            state={{ order: paginatedPickedOrderQueueEntries[index] }}
-            name="order-actions-slot"
-          />
-        </OrderCustomOverflowMenuComponent>
-      ),
-    }));
+    return paginatedPickedOrderQueueEntries.map((entry, index) => {
+      return {
+        ...entry,
+        id: entry?.uuid,
+        date: (
+          <span className={styles["single-line-display"]}>
+            {formatDate(parseDate(entry?.dateActivated))}
+          </span>
+        ),
+        patient: entry?.patient?.display.split("-")[1],
+        artNumber: entry.patient?.identifiers
+          .find(
+            (item) =>
+              item?.identifierType?.uuid ===
+              "e1731641-30ab-102d-86b0-7a5022ba4115"
+          )
+          ?.display.split("=")[1]
+          .trim(),
+        orderNumber: entry?.orderNumber,
+        test: entry?.concept?.display,
+        action: entry?.action,
+        orderer: entry?.orderer?.display,
+        urgency: entry?.urgency,
+        actions: (
+          <OrderCustomOverflowMenuComponent
+            menuTitle={
+              <>
+                <OverflowMenuVertical
+                  size={16}
+                  style={{ marginLeft: "0.3rem" }}
+                />
+              </>
+            }
+          >
+            <ExtensionSlot
+              className={styles.menuLink}
+              state={{ order: paginatedPickedOrderQueueEntries[index] }}
+              name="order-actions-slot"
+            />
+          </OrderCustomOverflowMenuComponent>
+        ),
+      };
+    });
   }, [paginatedPickedOrderQueueEntries]);
 
   if (isLoading) {

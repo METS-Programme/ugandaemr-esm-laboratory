@@ -4,7 +4,7 @@ import SummaryTile from "../summary-tiles/summary-tile.component";
 import { useLabTestsStats } from "../summary-tiles/laboratory-summary.resource";
 import dayjs from "dayjs";
 
-const ReferredTileComponent = () => {
+const ApprovedTileComponent = () => {
   const { t } = useTranslation();
 
   const today = dayjs(new Date()).format("YYYY-MM-DD");
@@ -15,9 +15,9 @@ const ReferredTileComponent = () => {
     <SummaryTile
       label={t("completed", "Completed")}
       value={data?.length}
-      headerLabel={t("results", "Results")}
+      headerLabel={t("approved", "Approved")}
     />
   );
 };
 
-export default ReferredTileComponent;
+export default ApprovedTileComponent;

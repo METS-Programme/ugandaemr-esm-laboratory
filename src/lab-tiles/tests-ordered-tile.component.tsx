@@ -4,7 +4,7 @@ import SummaryTile from "../summary-tiles/summary-tile.component";
 import dayjs from "dayjs";
 import { useGetOrdersWorklist } from "../work-list/work-list.resource";
 
-const ReferredTileComponent = () => {
+const TestsOrderedTileComponent = () => {
   const { t } = useTranslation();
   const today = dayjs(new Date()).format("YYYY-MM-DD");
   const { data } = useGetOrdersWorklist("", today);
@@ -25,4 +25,4 @@ const ReferredTileComponent = () => {
   );
 };
 
-export default ReferredTileComponent;
+export default TestsOrderedTileComponent;

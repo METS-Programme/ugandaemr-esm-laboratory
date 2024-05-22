@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import SummaryTile from "../summary-tiles/summary-tile.component";
 import { useLabTestsStats } from "../summary-tiles/laboratory-summary.resource";
 
-const ReferredTileComponent = () => {
+const RejectedTileComponent = () => {
   const { t } = useTranslation();
 
   const { data } = useLabTestsStats("");
 
   const filteredData = data?.filter(
-    (item) => item?.fulfillerStatus === "EXCEPTION" || item?.action === "REVISE"
+    (item) => item?.fulfillerStatus === "DECLINED"
   );
 
   return (
@@ -21,4 +21,4 @@ const ReferredTileComponent = () => {
   );
 };
 
-export default ReferredTileComponent;
+export default RejectedTileComponent;
