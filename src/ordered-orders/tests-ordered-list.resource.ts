@@ -1,5 +1,6 @@
-import { Order } from "@openmrs/esm-patient-common-lib";
-
+import { formatDate, openmrsFetch, parseDate } from "@openmrs/esm-framework";
+import dayjs from "dayjs";
+import useSWR from "swr";
 export interface PatientQueue {
   uuid: string;
   creator: {
@@ -41,7 +42,6 @@ export interface PatientQueue {
     };
     voided: boolean;
   };
-  encounter: Encounter;
   provider: {
     uuid: string;
     display: string;
@@ -117,68 +117,59 @@ export interface UuidDisplay {
   display: string;
 }
 
-export interface Encounter {
-  uuid: string;
-  display: string;
-  encounterDatetime: string;
-  patient: Patient;
-  location: Location;
-  form: Form;
-  encounterType: EncounterType;
-  obs: Ob[];
-  orders: Order[];
-  voided: boolean;
-  visit: Visit;
-  encounterProviders: EncounterProvider[];
-  diagnoses: any[];
-  links: Link[];
-  resourceVersion: string;
+export function usePatientQueuesList(
+  currentQueueLocationUuid: string,
+  status: string,
+  provider: string
+) {
+  const apiUrl = `/ws/rest/v1/patientqueue?v=full&status=${status}&room=${currentQueueLocationUuid}`;
+  return usePatientQueueRequest(apiUrl, provider);
 }
+export function usePatientQueueRequest(apiUrl: string, provider) {
+  const { data, error, isLoading, isValidating, mutate } = useSWR<
+    { data: { results: Array<PatientQueue> } },
+    Error
+  >(apiUrl, openmrsFetch, { refreshInterval: 3000 });
 
-export interface Patient {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
+  const mapppedQueues = data?.data?.results.map((queue: PatientQueue) => {
+    return {
+      ...queue,
+      id: queue.uuid,
+      name: queue.patient?.person.display,
+      patientUuid: queue.patient?.uuid,
+      provider: queue.provider?.person.display,
+      priorityComment: queue.priorityComment,
+      priority:
+        queue.priorityComment === "Urgent" ? "Priority" : queue.priorityComment,
+      priorityLevel: queue.priority,
+      waitTime: queue.dateCreated
+        ? `${dayjs().diff(dayjs(queue.dateCreated), "minutes")}`
+        : "--",
+      status: queue.status,
+      patientAge: queue.patient?.person?.age,
+      patientSex: queue.patient?.person?.gender === "M" ? "MALE" : "FEMALE",
+      patientDob: queue.patient?.person?.birthdate
+        ? formatDate(parseDate(queue.patient.person.birthdate), { time: false })
+        : "--",
+      identifiers: queue.patient?.identifiers,
+      locationFrom: queue.locationFrom?.uuid,
+      locationTo: queue.locationTo?.uuid,
+      locationToName: queue.locationTo?.name,
+      queueRoom: queue.locationTo?.display,
+      visitNumber: queue.visitNumber,
+      dateCreated: queue.dateCreated,
+      creatorUuid: queue.creator?.uuid,
+      creatorUsername: queue.creator?.username,
+      creatorDisplay: queue.creator?.display,
+    };
+  });
 
-export interface Link {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Location {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
-
-export interface Form {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
-
-export interface EncounterType {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
-
-export interface Ob {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
-
-export interface Visit {
-  uuid: string;
-  display: string;
-  links: Link[];
-}
-
-export interface EncounterProvider {
-  uuid: string;
-  display: string;
-  links: Link[];
+  return {
+    patientQueueEntries: mapppedQueues || [],
+    patientQueueCount: mapppedQueues?.length,
+    isLoading,
+    isError: error,
+    isValidating,
+    mutate,
+  };
 }

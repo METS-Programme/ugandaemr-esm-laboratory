@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { usePagination, useSession } from "@openmrs/esm-framework";
+
 import {
   DataTable,
   Table,
@@ -12,17 +12,18 @@ import {
   TableRow,
   Tile,
   Pagination,
+  InlineLoading,
   TableExpandHeader,
   TableExpandRow,
   TableExpandedRow,
 } from "@carbon/react";
-import { getStatusColor } from "../utils/functions";
-import styles from "./referred-orders.scss";
+import styles from "./work-list.scss";
+import { usePagination, useSession } from "@openmrs/esm-framework";
 import { usePatientQueuesList } from "../ordered-orders/tests-ordered-list.resource";
 import TestOrders from "../ordered-orders/ordered-test-orders.component";
-import ReferredTestOrders from "./referred-test-orders.component";
+import WorkListTestOrders from "./work-list-test-orders.component";
 
-const ReferredList: React.FC = () => {
+const WorkList: React.FC = () => {
   const { t } = useTranslation();
   const session = useSession();
 
@@ -39,8 +40,16 @@ const ReferredList: React.FC = () => {
     results: paginatedQueueEntries,
     currentPage,
   } = usePagination(patientQueueEntries, currentPageSize);
+  // get picked orders
 
-  // table columns
+  const [ordersCount, setOrdersCount] = useState<{
+    [patientUuid: string]: number;
+  }>({});
+
+  const updateOrdersCount = (patientUuid: string, number: number) => {
+    setOrdersCount((prev) => ({ ...prev, [patientUuid]: number }));
+  };
+
   const tableHeaders = useMemo(
     () => [
       { id: 0, header: t("patient", "Patient"), key: "name" },
@@ -49,15 +58,20 @@ const ReferredList: React.FC = () => {
     ],
     [t]
   );
+
   const tableRows = useMemo(() => {
     return paginatedQueueEntries.map((entry, index) => ({
       ...entry,
       name: {
         content: <span>{entry?.name}</span>,
       },
-      orders: "",
+      orders: ordersCount[entry.patientUuid] ?? 0,
     }));
   }, [paginatedQueueEntries]);
+
+  if (isLoading) {
+    return <InlineLoading status="active" />;
+  }
 
   return (
     <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
@@ -97,8 +111,11 @@ const ReferredList: React.FC = () => {
                       ))}
                     </TableExpandRow>
                     <TableExpandedRow colSpan={headers.length + 1}>
-                      <ReferredTestOrders
+                      <WorkListTestOrders
                         patientUuid={tableRows[index]?.patientUuid}
+                        orderNumberChange={(number) => {
+                          // updateOrdersCount(row.id, );
+                        }}
                       />
                     </TableExpandedRow>
                   </React.Fragment>
@@ -140,4 +157,4 @@ const ReferredList: React.FC = () => {
   );
 };
 
-export default ReferredList;
+export default WorkList;

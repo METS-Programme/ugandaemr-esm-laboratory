@@ -7,7 +7,7 @@ import {
   useConfig,
 } from "@openmrs/esm-framework";
 
-import { Result } from "../work-list/work-list.resource";
+import { Result } from "../worklist-orders/work-list.resource";
 
 export function useMetrics() {
   const metrics = {

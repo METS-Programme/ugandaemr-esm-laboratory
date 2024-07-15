@@ -17,9 +17,9 @@ const RejectedTileComponent = () => {
 
   return (
     <SummaryTile
-      label={t("orders", "Tests")}
+      label={t("rejected", "Rejected")}
       value={filteredData?.length}
-      headerLabel={t("testsRejected", "Rejected")}
+      headerLabel={t("rejectedTests", "Rejected Tests")}
     />
   );
 };

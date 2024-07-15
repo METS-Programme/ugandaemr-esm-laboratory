@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { usePagination, useSession } from "@openmrs/esm-framework";
 import {
   DataTable,
   Table,
@@ -12,21 +10,32 @@ import {
   TableRow,
   Tile,
   Pagination,
+  DataTableSkeleton,
   TableExpandHeader,
   TableExpandRow,
   TableExpandedRow,
 } from "@carbon/react";
-import { getStatusColor } from "../utils/functions";
-import styles from "./referred-orders.scss";
-import { usePatientQueuesList } from "../ordered-orders/tests-ordered-list.resource";
-import TestOrders from "../ordered-orders/ordered-test-orders.component";
-import ReferredTestOrders from "./referred-test-orders.component";
 
-const ReferredList: React.FC = () => {
+import { useTranslation } from "react-i18next";
+import {
+  ErrorState,
+  useLayoutType,
+  useLocations,
+  usePagination,
+  useSession,
+} from "@openmrs/esm-framework";
+import styles from "./tests-ordered.scss";
+import { usePatientQueuesList } from "./tests-ordered-list.resource";
+import { formatWaitTime, trimVisitNumber } from "../utils/functions";
+import TestOrders from "./ordered-test-orders.component";
+
+const TestsOrderedList: React.FC = () => {
   const { t } = useTranslation();
   const session = useSession();
+  const isTablet = useLayoutType() === "tablet";
+  const locations = useLocations();
 
-  const { patientQueueEntries, isLoading } = usePatientQueuesList(
+  const { patientQueueEntries, isLoading, isError } = usePatientQueuesList(
     session?.sessionLocation?.uuid,
     status,
     session.user.systemId
@@ -40,24 +49,72 @@ const ReferredList: React.FC = () => {
     currentPage,
   } = usePagination(patientQueueEntries, currentPageSize);
 
-  // table columns
   const tableHeaders = useMemo(
     () => [
-      { id: 0, header: t("patient", "Patient"), key: "name" },
-
-      { id: 1, header: t("orders", "Orders"), key: "orders" },
+      { id: 0, header: t("visitId", "Visit ID"), key: "visitId" },
+      {
+        id: 1,
+        header: t("patientNo", "Patient No."),
+        key: "patientNo",
+      },
+      {
+        id: 2,
+        header: t("names", "Names"),
+        key: "names",
+      },
+      {
+        id: 3,
+        header: t("age", "Age"),
+        key: "age",
+      },
+      {
+        id: 4,
+        header: t("orderedFrom", "OrderedFrom"),
+        key: "orderedFrom",
+      },
+      {
+        id: 5,
+        header: t("waitingTime", "Waiting Time"),
+        key: "waitTime",
+      },
     ],
     [t]
   );
+
   const tableRows = useMemo(() => {
-    return paginatedQueueEntries.map((entry, index) => ({
+    return paginatedQueueEntries?.map((entry) => ({
       ...entry,
-      name: {
+      id: entry.uuid,
+      patientUuid: entry.patientUuid,
+      visitId: {
+        content: <span>{trimVisitNumber(entry.visitNumber)}</span>,
+      },
+      patientNo: {
+        content: <span>{entry?.identifiers[0].display}</span>,
+      },
+      names: {
         content: <span>{entry?.name}</span>,
       },
-      orders: "",
+      age: {
+        content: <span>{entry?.patientAge}</span>,
+      },
+      orderedFrom: {
+        content: locations.find((loc) => loc.uuid === entry?.locationFrom)
+          ?.display,
+      },
+      waitTime: {
+        content: <span> {formatWaitTime(entry.waitTime, t)}</span>,
+      },
     }));
   }, [paginatedQueueEntries]);
+
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
+  }
+
+  if (isError) {
+    return <ErrorState error={isError} headerTitle={"Ordered Tests"} />;
+  }
 
   return (
     <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
@@ -71,7 +128,7 @@ const ReferredList: React.FC = () => {
         getTableContainerProps,
       }) => (
         <TableContainer
-          {...getTableContainerProps}
+          {...getTableContainerProps()}
           className={styles.tableContainer}
         >
           <Table {...getTableProps()} className={styles.activePatientsTable}>
@@ -97,9 +154,7 @@ const ReferredList: React.FC = () => {
                       ))}
                     </TableExpandRow>
                     <TableExpandedRow colSpan={headers.length + 1}>
-                      <ReferredTestOrders
-                        patientUuid={tableRows[index]?.patientUuid}
-                      />
+                      <TestOrders patientUuid={tableRows[index].patientUuid} />
                     </TableExpandedRow>
                   </React.Fragment>
                 );
@@ -140,4 +195,4 @@ const ReferredList: React.FC = () => {
   );
 };
 
-export default ReferredList;
+export default TestsOrderedList;

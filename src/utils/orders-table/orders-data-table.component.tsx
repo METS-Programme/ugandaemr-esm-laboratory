@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   DataTable,
-  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -9,78 +8,80 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
   Tile,
-  TableToolbar,
-  TableToolbarContent,
-  Layer,
-  TableToolbarSearch,
-  Dropdown,
-  DatePicker,
-  DatePickerInput,
+  Pagination,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
 } from "@carbon/react";
 import styles from "./orders-data-table.scss";
 import { useTranslation } from "react-i18next";
+import { useLayoutType, usePagination } from "@openmrs/esm-framework";
 
 interface OrdersDataTableProps {
-  tabTitle: string;
-  currentPage: number;
-  currentPageSize: number;
-  pageSizes: number[];
-  totalItems: number;
-  setPageSize: (page: number) => void;
-  goTo: (page: number) => void;
-  orders: Array<Record<string, any>>;
+  data?: Array<Record<string, any>>;
+  children?: () => React.ReactElement;
+  expanded?: boolean;
+  showPagination?: boolean;
+  showCheck?: boolean;
   rows: Array<Record<string, any>>;
   columns: Array<Record<string, any>>;
 }
 
 const OrdersDataTable: React.FC<OrdersDataTableProps> = ({
-  tabTitle,
-  currentPage,
-  currentPageSize,
-  pageSizes,
-  totalItems,
-  setPageSize,
-  goTo,
   rows,
   columns,
+  showCheck,
+  showPagination,
+  expanded,
+  children,
+  data,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === "tablet";
 
-  const [activatedOnOrAfterDate, setActivatedOnOrAfterDate] = useState("");
+  const pageSizes = [10, 20, 30, 40, 50];
+  const [currentPageSize, setPageSize] = useState(10);
+  const {
+    goTo,
+    results: paginatedRows,
+    currentPage,
+  } = usePagination(data, currentPageSize);
 
   return (
-    <DataTable rows={rows} headers={columns} useZebraStyles>
-      {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-        <TableContainer className={styles.tableContainer}>
-          <TableToolbar style={{ position: "static" }}>
-            <TableToolbarContent>
-              <Layer style={{ margin: "5px" }}>
-                <DatePicker dateFormat="Y-m-d" datePickerType="single">
-                  <DatePickerInput
-                    labelText={""}
-                    id="activatedOnOrAfterDate"
-                    placeholder="YYYY-MM-DD"
-                    onChange={(event) => {
-                      setActivatedOnOrAfterDate(event?.target?.value);
-                    }}
-                    type="date"
-                    value={activatedOnOrAfterDate}
-                  />
-                </DatePicker>
-              </Layer>
-              <Layer style={{ margin: "5px" }}>
-                <TableToolbarSearch
-                  persistent
-                  placeholder={t("searchThisList", "Search this list")}
-                  size="sm"
-                />
-              </Layer>
-            </TableToolbarContent>
-          </TableToolbar>
-          <Table {...getTableProps()} className={styles.activePatientsTable}>
+    <DataTable
+      rows={rows}
+      headers={columns}
+      size={isTablet ? "lg" : "sm"}
+      useZebraStyles
+    >
+      {({
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getTableProps,
+        getTableContainerProps,
+        getSelectionProps,
+        getExpandHeaderProps,
+      }) => (
+        <TableContainer
+          {...getTableContainerProps()}
+          className={styles.tableContainer}
+        >
+          <Table
+            {...getTableProps()}
+            className={styles.activePatientsTable}
+            aria-label="testorders"
+          >
             <TableHead>
               <TableRow>
+                {showCheck && <TableSelectAll {...getSelectionProps()} />}
+                {expanded && (
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                )}
                 {headers.map((header) => (
                   <TableHeader {...getHeaderProps({ header })}>
                     {header.header?.content ?? header.header}
@@ -91,9 +92,30 @@ const OrdersDataTable: React.FC<OrdersDataTableProps> = ({
             <TableBody>
               {rows.map((row) => (
                 <React.Fragment key={row.id}>
-                  <TableRow {...getRowProps({ row })} key={row.id}>
+                  {expanded && (
+                    <>
+                      <TableExpandRow {...getRowProps({ row })} key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>
+                            {cell.value?.content ?? cell.value}
+                          </TableCell>
+                        ))}
+                      </TableExpandRow>
+                      <TableExpandedRow colSpan={headers.length + 1}>
+                        {children && children.length > 0 && children}
+                      </TableExpandedRow>
+                    </>
+                  )}
+                  <TableRow {...getRowProps({ row })}>
+                    {showCheck && (
+                      <TableSelectRow
+                        {...getSelectionProps({
+                          row,
+                        })}
+                      />
+                    )}
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell key={cell.id} className={styles.testCell}>
                         {cell.value?.content ?? cell.value}
                       </TableCell>
                     ))}
@@ -107,29 +129,31 @@ const OrdersDataTable: React.FC<OrdersDataTableProps> = ({
               <Tile className={styles.tile}>
                 <div className={styles.tileContent}>
                   <p className={styles.content}>
-                    {t("noOrdersList", `No ${tabTitle} orders to display`)}
+                    {t("noPatientsToDisplay", "No patients to display")}
                   </p>
                 </div>
               </Tile>
             </div>
           ) : null}
-          <Pagination
-            forwardText="Next page"
-            backwardText="Previous page"
-            page={currentPage}
-            pageSize={currentPageSize}
-            pageSizes={pageSizes}
-            totalItems={totalItems}
-            className={styles.pagination}
-            onChange={({ pageSize, page }) => {
-              if (pageSize !== currentPageSize) {
-                setPageSize(pageSize);
-              }
-              if (page !== currentPage) {
-                goTo(page);
-              }
-            }}
-          />
+          {showPagination && (
+            <Pagination
+              forwardText="Next page"
+              backwardText="Previous page"
+              page={currentPage}
+              pageSize={currentPageSize}
+              pageSizes={pageSizes}
+              totalItems={paginatedRows?.length}
+              className={styles.pagination}
+              onChange={({ pageSize, page }) => {
+                if (pageSize !== currentPageSize) {
+                  setPageSize(pageSize);
+                }
+                if (page !== currentPage) {
+                  goTo(page);
+                }
+              }}
+            />
+          )}
         </TableContainer>
       )}
     </DataTable>

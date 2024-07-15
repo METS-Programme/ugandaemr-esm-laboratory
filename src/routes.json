@@ -49,6 +49,10 @@
             "component": "addToWorklistDialog"
         },
         {
+            "name": "schedule-test-orders-dialog",
+            "component": "scheduleTestOrdersDialog"
+        },
+        {
             "name": "results-summary",
             "component": "resultsSummaryWorkSpace"
         },
@@ -74,43 +78,7 @@
             "component": "worklistComponent",
             "meta": {
                 "name": "worklistPanelSlot",
-                "title": "Worklist"
-            }
-        },
-        {
-            "name": "review-panel-component",
-            "slot": "lab-panels-slot",
-            "component": "reviewComponent",
-            "meta": {
-                "name": "reviewPanelSlot",
-                "title": "Review"
-            }
-        },
-        {
-            "name": "approved-panel-component",
-            "slot": "lab-panels-slot",
-            "component": "approvedComponent",
-            "meta": {
-                "name": "approvedPanelSlot",
-                "title": "Approved"
-            }
-        },
-        {
-          "name": "rejected-panel-component",
-          "slot": "lab-panels-slot",
-          "component": "rejectedComponent",
-          "meta": {
-            "name": "rejectedPanelSlot",
-            "title": "Rejected"
-          }
-        },
-        {
-            "name": "tests-ordered-tile-component",
-            "slot": "lab-tiles-slot",
-            "component": "testOrderedTileComponent",
-            "meta": {
-                "name": "testsOrderedTileSlot",
-                "title": "Ordered tests"
+                "title": "Work List"
             }
         },
         {
@@ -119,35 +87,71 @@
             "component": "referredTestComponent",
             "meta": {
                 "name": "referredPanleSlot",
-                "title": "Referred Tests"
+                "title": "Referred List"
             }
         },
-      {
-        "name": "worklist-tile-component",
-        "slot": "lab-tiles-slot",
-        "component": "worklistTileComponent",
-        "meta": {
-          "name": "worklisTileSlot",
-          "title": "Worklist"
-        }
-      },
+        {
+            "name": "review-panel-component",
+            "slot": "lab-panels-slot",
+            "component": "reviewComponent",
+            "meta": {
+                "name": "reviewPanelSlot",
+                "title": "Review List"
+            }
+        },
+        {
+            "name": "approved-panel-component",
+            "slot": "lab-panels-slot",
+            "component": "approvedComponent",
+            "meta": {
+                "name": "approvedPanelSlot",
+                "title": "Approved List"
+            }
+        },
+        {
+            "name": "rejected-panel-component",
+            "slot": "lab-panels-slot",
+            "component": "rejectedComponent",
+            "meta": {
+                "name": "rejectedPanelSlot",
+                "title": "Rejected List"
+            }
+        },
+        {
+            "name": "tests-ordered-tile-component",
+            "slot": "lab-tiles-slot",
+            "component": "testOrderedTileComponent",
+            "meta": {
+                "name": "testsOrderedTileSlot",
+                "title": "Ordered Tests"
+            }
+        },
+        {
+            "name": "worklist-tile-component",
+            "slot": "lab-tiles-slot",
+            "component": "worklistTileComponent",
+            "meta": {
+                "name": "worklisTileSlot",
+                "title": "Work List"
+            }
+        },
         {
             "name": "completed-tile-component",
             "slot": "lab-tiles-slot",
             "component": "completedTileComponent",
             "meta": {
                 "name": "completedTileSlot",
-                "title": "Completed"
+                "title": "Completed Test"
             }
         },
         {
-          "name": "rejected-tile-component",
-          "slot": "lab-tiles-slot",
-          "component": "rejectedTileComponent",
-          "meta": {
-            "name": "rejectedTileSlot",
-            "title": "Rejected Tests"
-          }
+            "name": "rejected-tile-component",
+            "slot": "lab-tiles-slot",
+            "component": "rejectedTileComponent",
+            "meta": {
+                "name": "rejectedTileSlot",
+                "title": "Rejected Tests"
+            }
         },
         {
             "name": "referred-tile-component",
@@ -160,13 +164,60 @@
         },
         {
             "name": "pick-lab-request-button",
-            "component": "pickLabRequestButton",
-            "slot": "order-actions-slot"
+            "component": "pickWorklistOrderButton",
+            "slot": "tests-ordered-actions-slot"
         },
         {
             "name": "reject-order-button",
-            "component": "rejectOrderButton",
-            "slot": "order-actions-slot"
+            "component": "rejectWorklistOrderButton",
+            "slot": "tests-ordered-actions-slot"
+        },
+
+        {
+            "name": "add-worklist-order-button",
+            "component": "addOrEditOrderResultsButton",
+            "slot": "worklist-order-actions-slot"
+        },
+
+          {
+            "name": "reject-worklist-order-button",
+            "component": "rejectWorklistOrderButton",
+            "slot": "worklist-order-actions-slot"
+        },
+          {
+            "name": "add-referred-order-results-button",
+            "component": "addorEditReferredOrderButton",
+            "slot": "referred-order-actions-slot"
+        },
+
+         {
+            "name": "edit-referred-order-results-button",
+            "component": "addOrEditReferredOrderButton",
+            "slot": "referred-order-actions-slot"
+        },
+          {
+            "name": "reject-referred-order-button",
+            "component": "rejectReferredOrderButton",
+            "slot": "referred-order-actions-slot"
+        },
+    
+        {
+            "name": "review-order-results-button",
+            "component": "editOrReviewOrderResultsButton",
+            "slot": "review-order-actions-slot"
+        },
+          
+        {
+            "name": "edit-order-results-button",
+            "component": "editOrReviewOrderResultsButton",
+            "slot": "review-order-actions-slot"
+        },
+
+         {
+            "name": "print-order-results-button",
+            "component": "printOrderResultsButton",
+            "slot": "approved-order-actions-slot"
         }
+        
     ]
 }

@@ -12,9 +12,9 @@ const ApprovedTileComponent = () => {
 
   return (
     <SummaryTile
-      label={t("completed", "Completed")}
+      label={t("approved", "Approved")}
       value={data?.length}
-      headerLabel={t("approved", "Approved")}
+      headerLabel={t("approved", "Approved Tests")}
     />
   );
 };

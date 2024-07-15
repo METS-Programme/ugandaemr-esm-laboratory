@@ -5,27 +5,32 @@ import rootComponent from "./root.component";
 import laboratoryReferralWorkspaceComponent from "./patient-chart/laboratory-workspaces/laboratory-referral.workspace.component";
 import laboratory from "./laboratory.component";
 import laboratoryOrder from "./patient-chart/patient-laboratory-order-results.component";
-import addToWorklist from "./tests-ordered/lab-dialogs/add-to-worklist-dialog.component";
+import addToWorklist from "./ordered-orders/ordered-tests-dialogs/pick-orders-dialog/pick-order-dialog.component";
+import scheduleTestOrders from "./ordered-orders/ordered-tests-dialogs/schedule-orders-dialog/schedulue-test-orders-dialog.component";
 import sendEmail from "./patient-chart/results-summary/send-email-dialog.component";
-import reviewItemDialogComponent from "./review-list/dialog/review-item.component";
-import rejectOrderDialogComponent from "./reject-order/reject-order-dialog.component";
-import approvedTabComponent from "./lab-tabs/approved-tab.component";
-import referredTestTabComponent from "./lab-tabs/referred-tab.component";
-import worklistTabComponent from "./lab-tabs/work-list-tab.component";
-import reveiwTabComponent from "./lab-tabs/review-tab.component";
-import pickLabRequestButtonComponent from "./tests-ordered/pick-lab-request-menu.component";
-import rejectOrderButtonComponent from "./order-actions/reject-order.component";
+import reviewItemDialogComponent from "./reviewed-orders/review-order-dialog/review-item.component";
+import rejectOrderDialogComponent from "./reject-order-dialog/reject-order-dialog.component";
+import approvedTabComponent from "./laboratory-tabs/laboratory-tab/approved-tab.component";
+import referredTestTabComponent from "./laboratory-tabs/laboratory-tab/referred-tab.component";
+import worklistTabComponent from "./laboratory-tabs/laboratory-tab/work-list-tab.component";
+import reveiwTabComponent from "./laboratory-tabs/laboratory-tab/review-tab.component";
+import pickLabRequestButtonComponent from "./ordered-orders/ordered-tests-actions/pick-test-order-menu.component";
 import worklistTile from "./lab-tiles/worklist-tile.component";
 import referredTile from "./lab-tiles/referred-tile.component";
 import completedTile from "./lab-tiles/completed-tile.component";
 import testsOrdered from "./lab-tiles/tests-ordered-tile.component";
 import rejectedTile from "./lab-tiles/rejected-tile.component";
-
+import addOrEditOrderResultsButtonComponent from "./worklist-orders/add-or-edit-order-results-menu-item.component";
+import rejectWorklistOrderButtonComponent from "./worklist-orders/reject-worklist-order-menu-item.component";
+import editOrReviewOrderResultsButtonComponent from "./reviewed-orders/edit-or-review-order-results-menu-item.component";
+import addOrEditReferredOrderButtonComponent from "./referred-orders/add-or-edit-referred-order-menu-item.component";
+import rejectReferredOrderButtonComponent from "./referred-orders/reject-referred-order-menu-item.component";
+import printOrderResultsButtonComponent from "./approved-orders/print-order-results-menu-item.component";
 import {
   createDashboardLink,
   registerWorkspace,
 } from "@openmrs/esm-patient-common-lib";
-import rejectedTabComponent from "./lab-tabs/rejected-tab.component";
+import rejectedTabComponent from "./laboratory-tabs/laboratory-tab/rejected-tab.component";
 
 const moduleName = "@ugandaemr/esm-laboratory-app";
 
@@ -70,6 +75,11 @@ export const laboratoryOrderComponent = getSyncLifecycle(
 
 export const addToWorklistDialog = getSyncLifecycle(addToWorklist, options);
 
+export const scheduleTestOrdersDialog = getSyncLifecycle(
+  scheduleTestOrders,
+  options
+);
+
 export const sendEmailDialog = getSyncLifecycle(sendEmail, options);
 
 export const reviewItemDialog = getSyncLifecycle(
@@ -104,16 +114,47 @@ export const worklistComponent = getSyncLifecycle(
   options
 );
 
-export const pickLabRequestButton = getSyncLifecycle(
+// buttons
+// tests ordered
+export const pickWorklistOrderButton = getSyncLifecycle(
   pickLabRequestButtonComponent,
   options
 );
 
-export const rejectOrderButton = getSyncLifecycle(
-  rejectOrderButtonComponent,
+// worklist
+export const addOrEditOrderResultsButton = getSyncLifecycle(
+  addOrEditOrderResultsButtonComponent,
   options
 );
 
+export const rejectWorklistOrderButton = getSyncLifecycle(
+  rejectWorklistOrderButtonComponent,
+  options
+);
+
+// reviewed
+export const editOrReviewOrderResultsButton = getSyncLifecycle(
+  editOrReviewOrderResultsButtonComponent,
+  options
+);
+
+// referred
+export const addOrEditReferredOrderButton = getSyncLifecycle(
+  addOrEditReferredOrderButtonComponent,
+  options
+);
+export const rejectReferredOrderButton = getSyncLifecycle(
+  rejectReferredOrderButtonComponent,
+  options
+);
+
+// approved
+export const printOrderResultsButton = getSyncLifecycle(
+  printOrderResultsButtonComponent,
+  options
+);
+
+// tiles
 export const worklistTileComponent = getSyncLifecycle(worklistTile, options);
 
 export const referredTileComponent = getSyncLifecycle(referredTile, options);

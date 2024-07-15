@@ -1,6 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { usePagination, useSession } from "@openmrs/esm-framework";
+import {
+  useSession,
+  usePagination,
+  formatDate,
+  parseDate,
+} from "@openmrs/esm-framework";
 import {
   DataTable,
   Table,
@@ -16,13 +21,11 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from "@carbon/react";
-import { getStatusColor } from "../utils/functions";
-import styles from "./referred-orders.scss";
+import styles from "./approved-list.scss";
 import { usePatientQueuesList } from "../ordered-orders/tests-ordered-list.resource";
-import TestOrders from "../ordered-orders/ordered-test-orders.component";
-import ReferredTestOrders from "./referred-test-orders.component";
+import ApprovedTestOrders from "./approved-test-orders.component";
 
-const ReferredList: React.FC = () => {
+const ApprovedList: React.FC = () => {
   const { t } = useTranslation();
   const session = useSession();
 
@@ -39,25 +42,34 @@ const ReferredList: React.FC = () => {
     results: paginatedQueueEntries,
     currentPage,
   } = usePagination(patientQueueEntries, currentPageSize);
-
-  // table columns
   const tableHeaders = useMemo(
     () => [
       { id: 0, header: t("patient", "Patient"), key: "name" },
 
       { id: 1, header: t("orders", "Orders"), key: "orders" },
+      { id: 2, header: t("date", "Date"), key: "date" },
+      {
+        id: 3,
+        header: t("action", "Action"),
+        key: "action",
+      },
     ],
     [t]
   );
+
   const tableRows = useMemo(() => {
-    return paginatedQueueEntries.map((entry, index) => ({
+    return patientQueueEntries.map((entry) => ({
       ...entry,
       name: {
         content: <span>{entry?.name}</span>,
       },
       orders: "",
+      date: {
+        content: <span>{formatDate(parseDate(entry?.dateCreated))}</span>,
+      },
+      action: "",
     }));
-  }, [paginatedQueueEntries]);
+  }, [patientQueueEntries]);
 
   return (
     <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
@@ -97,7 +109,7 @@ const ReferredList: React.FC = () => {
                       ))}
                     </TableExpandRow>
                     <TableExpandedRow colSpan={headers.length + 1}>
-                      <ReferredTestOrders
+                      <ApprovedTestOrders
                         patientUuid={tableRows[index]?.patientUuid}
                       />
                     </TableExpandedRow>
@@ -140,4 +152,4 @@ const ReferredList: React.FC = () => {
   );
 };
 
-export default ReferredList;
+export default ApprovedList;
