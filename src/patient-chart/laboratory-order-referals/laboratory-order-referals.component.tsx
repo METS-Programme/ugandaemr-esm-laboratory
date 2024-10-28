@@ -370,7 +370,6 @@ const LaboratoryOrderReferalResults: React.FC<
                       size="sm"
                     />
                   </Layer>
-                  {/* <ReferredDateFilter /> */}
                 </TableToolbarContent>
               </TableToolbar>
               <Table
