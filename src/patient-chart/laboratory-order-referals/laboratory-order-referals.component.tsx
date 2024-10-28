@@ -26,6 +26,7 @@ import {
   TableRow,
   TableToolbar,
   TableToolbarContent,
+  TableToolbarSearch,
   Layer,
   Tag,
   Tile,
@@ -59,7 +60,6 @@ import {
 } from "@openmrs/esm-patient-common-lib";
 import { mutate } from "swr";
 import { REFERINSTRUCTIONS } from "../../constants";
-import ReferredDateFilter from "./referred-date-filter.component";
 
 interface LaboratoryOrderReferalResultsProps {
   patientUuid: string;
@@ -86,8 +86,6 @@ const LaboratoryOrderReferalResults: React.FC<
     "referralLaboratoryTestsDisplayTextTitle",
     "Laboratory Referral Tests"
   );
-
-  const [orderDate, setOrderDate] = useState("");
 
   const {
     items,
@@ -126,6 +124,11 @@ const LaboratoryOrderReferalResults: React.FC<
   const [searchTerm, setSearchTerm] = useState("");
   const [laboratoryOrders, setLaboratoryOrders] = useState(sortedLabRequests);
   const [initialTests, setInitialTests] = useState(sortedLabRequests);
+
+  const handleChange = useCallback((event) => {
+    const searchText = event?.target?.value?.trim().toLowerCase();
+    setSearchTerm(searchText);
+  }, []);
 
   useEffect(() => {
     if (!searchTerm) {
@@ -313,7 +316,7 @@ const LaboratoryOrderReferalResults: React.FC<
                   backgroundColor: "color",
                 }}
               >
-                <TableToolbarContent>
+                <TableToolbarContent className={styles.referalFilter}>
                   <div
                     style={{
                       fontSize: "10px",
@@ -358,11 +361,16 @@ const LaboratoryOrderReferalResults: React.FC<
                       {"Rejected"}
                     </Tag>
                   </div>
-                  <Layer className={styles.referalFilter}>
-                    <ReferredDateFilter
-                      setDate={(date) => setOrderDate(date)}
+                  <Layer>
+                    <TableToolbarSearch
+                      expanded={true}
+                      value={searchTerm}
+                      onChange={handleChange}
+                      placeholder={t("searchThisList", "Search this list")}
+                      size="sm"
                     />
                   </Layer>
+                  {/* <ReferredDateFilter /> */}
                 </TableToolbarContent>
               </TableToolbar>
               <Table
@@ -400,7 +408,7 @@ const LaboratoryOrderReferalResults: React.FC<
                                 <TestsResults
                                   obs={sortedLabRequests[index]?.obs}
                                 />
-                              )}
+                              )}{" "}
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow
