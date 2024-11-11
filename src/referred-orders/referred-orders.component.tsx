@@ -74,7 +74,7 @@ const ReferredOrdersList: React.FC = () => {
     { id: 6, header: t("status", "Status"), key: "status" },
     { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
     { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
-    { id: 9, header: t("actions", "Actions"), key: "Actions" },
+    { id: 9, header: t("actions", "Actions"), key: "actions" },
   ];
   const tableRows = useMemo(() => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
