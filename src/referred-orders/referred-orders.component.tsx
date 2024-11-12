@@ -23,8 +23,6 @@ import {
   TableToolbarSearch,
   Layer,
   Tile,
-  DatePicker,
-  DatePickerInput,
 } from "@carbon/react";
 import { getStatusColor, useOrderDate } from "../utils/functions";
 import styles from "./referred-orders.scss";
@@ -83,7 +81,7 @@ const ReferredOrdersList: React.FC = () => {
         <ConfigurableLink
           to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}
         >
-          {entry?.patient?.display.split("-")[1]}
+          {entry?.patient?.names[0]?.display}
         </ConfigurableLink>
       ),
       artNumber: entry.patient?.identifiers
