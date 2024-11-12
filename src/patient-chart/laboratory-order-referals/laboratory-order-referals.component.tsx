@@ -11,7 +11,6 @@ import {
   formatDate,
   parseDate,
   ErrorState,
-  showModal,
   useConfig,
 } from "@openmrs/esm-framework";
 
@@ -41,7 +40,6 @@ import {
 
 import {
   Printer,
-  MailAll,
   Checkmark,
   SendAlt,
   NotSent,
@@ -81,12 +79,8 @@ const LaboratoryOrderReferalResults: React.FC<
 > = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const {
-    enableSendingLabTestsByEmail,
-    laboratoryEncounterTypeUuid,
-    artCardEncounterTypeUuid,
-    laboratoryOrderTypeUuid,
-  } = useConfig();
+  const { enableSendingLabTestsByEmail, laboratoryEncounterTypeUuid } =
+    useConfig();
 
   const displayText = t(
     "referralLaboratoryTestsDisplayTextTitle",
@@ -113,17 +107,11 @@ const LaboratoryOrderReferalResults: React.FC<
   const sortedLabRequests = useMemo(() => {
     return [...items]
       ?.filter((item) => {
-        const { encounterType, orders } = item || {};
-        const { uuid: encounterTypeUuid } = encounterType || {};
-
-        // Check if the encounterType UUID matches either of the specified UUIDs
-
-        // Filter orders to only include those with the matching orderType UUID
+        const { orders } = item || {};
         const matchingOrders = orders?.filter(
           (order) => order?.instructions === REFERINSTRUCTIONS
         );
 
-        // Return the item only if it has matching encounterType and at least one matching order
         return matchingOrders?.length > 0;
       })
       ?.sort((a, b) => {
@@ -158,23 +146,6 @@ const LaboratoryOrderReferalResults: React.FC<
   useEffect(() => {
     setInitialTests(sortedLabRequests);
   }, [sortedLabRequests]);
-
-  const EmailButtonAction: React.FC = () => {
-    const launchSendEmailModal = useCallback(() => {
-      const dispose = showModal("send-email-dialog", {
-        closeModal: () => dispose(),
-      });
-    }, []);
-
-    return (
-      <Button
-        kind="ghost"
-        size="sm"
-        onClick={(e) => launchSendEmailModal()}
-        renderIcon={(props) => <MailAll size={16} {...props} />}
-      />
-    );
-  };
 
   const EditReferralAction: React.FC<EditReferralActionProps> = ({
     formUuid,
@@ -305,7 +276,6 @@ const LaboratoryOrderReferalResults: React.FC<
             encounterUuid={entry[index]?.uuid}
           />
           <PrintButtonAction encounter={entry} />
-          {enableSendingLabTestsByEmail && <EmailButtonAction />}
         </div>
       ),
     }));
@@ -336,14 +306,7 @@ const LaboratoryOrderReferalResults: React.FC<
           headers={tableReferralHeaders}
           useZebraStyles
         >
-          {({
-            rows,
-            headers,
-            getHeaderProps,
-            getTableProps,
-            getRowProps,
-            onInputChange,
-          }) => (
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar
                 style={{
@@ -353,7 +316,7 @@ const LaboratoryOrderReferalResults: React.FC<
                   backgroundColor: "color",
                 }}
               >
-                <TableToolbarContent>
+                <TableToolbarContent className={styles.referalFilter}>
                   <div
                     style={{
                       fontSize: "10px",
