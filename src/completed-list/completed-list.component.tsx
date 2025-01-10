@@ -64,6 +64,7 @@ const CompletedList: React.FC<CompletedListProps> = ({ fulfillerStatus }) => {
     { id: 6, header: t("status", "Status"), key: "status" },
     { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
     { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 9, header: t("reviewed", "Reviewed By"), key: "reviewer" },
   ];
 
   const tableRows = useMemo(() => {
