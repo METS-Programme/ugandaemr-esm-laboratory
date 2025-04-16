@@ -44,7 +44,7 @@ export const configSchema = {
   },
   enableSpecimenIdAutoGeneration: {
     _type: Type.Boolean,
-    _default: true,
+    _default: false,
     _description:
       "Configuration to enable/disable auto speciment id generation button.",
   },
