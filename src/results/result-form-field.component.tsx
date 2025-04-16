@@ -45,9 +45,6 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({
 
   return (
     <>
-      {Object.keys(errors).length > 0 && (
-        <div className={styles.errorDiv}>All fields are required</div>
-      )}
       {isTextOrNumeric(concept) && (
         <Controller
           control={control}
