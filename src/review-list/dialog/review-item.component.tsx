@@ -198,10 +198,9 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
                                   </td>
                                   <td>
                                     <span>
-                                      {
-                                        filteredGroupedResults[test]?.value
-                                          ?.display
-                                      }
+                                      {filteredGroupedResults[test]?.value
+                                        ?.display ??
+                                        filteredGroupedResults[test]?.value}
                                     </span>
                                   </td>
                                   <td>
