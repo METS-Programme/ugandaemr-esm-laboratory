@@ -81,7 +81,7 @@ const CompletedList: React.FC<CompletedListProps> = ({ fulfillerStatus }) => {
 
         patient: (
           <ConfigurableLink
-            to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}
+            to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/Results`}
           >
             {entry?.patient?.display.split("-")[1]}
           </ConfigurableLink>
