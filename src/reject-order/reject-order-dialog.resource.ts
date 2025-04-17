@@ -1,9 +1,4 @@
-import {
-  FetchResponse,
-  openmrsFetch,
-  restBaseUrl,
-  useConfig,
-} from "@openmrs/esm-framework";
+import { openmrsFetch, restBaseUrl } from "@openmrs/esm-framework";
 
 export async function RejectOrder(uuid: string, body: any) {
   const abortController = new AbortController();
