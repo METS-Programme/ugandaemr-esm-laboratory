@@ -36,7 +36,7 @@ const RejectOrderDialog: React.FC<RejectOrderDialogProps> = ({
       fulfillerComment: notes,
     };
     RejectOrder(order.uuid, payload).then(
-      (resp) => {
+      () => {
         showSnackbar({
           isLowContrast: true,
           title: t("rejectOrder", "Rejected Order"),
