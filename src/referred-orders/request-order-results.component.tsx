@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, InlineLoading } from "@carbon/react";
 import { SyncTestOrder } from "../work-list/work-list.resource";
+import { showSnackbar } from "@openmrs/esm-framework";
 
 interface RequestResultsActionProps {
     orders: string[];
@@ -8,30 +9,67 @@ interface RequestResultsActionProps {
 
 const RequestResultsAction: React.FC<RequestResultsActionProps> = ({ orders }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleRequestResults = async () => {
+        if (orders.length === 0) {
+            showSnackbar({
+                title: "Request ViralLoad",
+                subtitle: "No orders selected to request results.",
+                kind: "warning",
+            });
+            return;
+        }
+
         try {
             setIsSubmitting(true);
+            setIsSuccess(false);
+
             const response = await SyncTestOrder(orders);
 
             if (response.status === 201) {
-                console.log("Results requested successfully:", response);
+                showSnackbar({
+                    title: "Request ViralLoad",
+                    subtitle: "Request sent successfully.",
+                    kind: "success",
+                });
+                setIsSuccess(true);
             } else {
-                console.error("Error requesting results, status:", response.status);
+                showSnackbar({
+                    title: "Request ViralLoad",
+                    subtitle: `Unexpected response status: ${response.status}`,
+                    kind: "error",
+                });
             }
-        } catch (error) {
-            console.error("Request failed:", error);
+        } catch (error: any) {
+            showSnackbar({
+                title: "Request ViralLoad",
+                subtitle: `Request failed: ${error?.message ?? "Unknown error"}`,
+                kind: "error",
+            });
         } finally {
-            setIsSubmitting(false);
+            // Small delay to show the success state if applicable
+            setTimeout(() => {
+                setIsSubmitting(false);
+                setIsSuccess(false);
+            }, 1500);
         }
     };
 
     return (
         <div>
             {isSubmitting ? (
-                <InlineLoading description="Requesting results..." />
+                <InlineLoading
+                    description={isSuccess ? "Request sent!" : "Requesting results..."}
+                    status={isSuccess ? "finished" : "active"}
+                />
             ) : (
-                <Button kind="ghost" size="sm" onClick={handleRequestResults} disabled={orders.length === 0}>
+                <Button
+                    kind="ghost"
+                    size="sm"
+                    onClick={handleRequestResults}
+                    disabled={orders.length === 0}
+                >
                     Request Results
                 </Button>
             )}
