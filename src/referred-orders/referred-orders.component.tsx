@@ -19,20 +19,26 @@ import {
   TableHeader,
   TableRow,
   TableToolbar,
+  TableSelectAll,
+  TableSelectRow,
   TableToolbarContent,
-  TableToolbarSearch,
   Layer,
   Tile,
+  Button,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow
 } from "@carbon/react";
 import { getStatusColor, useOrderDate } from "../utils/functions";
 import styles from "./referred-orders.scss";
-import dayjs from "dayjs";
 import { REFERINSTRUCTIONS } from "../constants";
+import RequestResultsAction from "./request-order-results.component";
 
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
 
   const { currentOrdersDate } = useOrderDate();
+
 
   const { data: referredOrderList, isLoading } = useGetOrdersWorklist(
     "",
@@ -55,6 +61,20 @@ const ReferredOrdersList: React.FC = () => {
     currentPage,
   } = usePagination(filtered, currentPageSize);
 
+  const handleSync = (selectedRows: any[]) => {
+    if (selectedRows.length === 0) {
+      alert("No rows selected to sync (delete).");
+      return;
+    }
+
+    const idsToDelete = selectedRows.map((row) => row.id);
+
+
+    // Optional: show a success message
+    alert(`Selected  ${idsToDelete} row(s)!`);
+  };
+
+
   // table columns
   let columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
@@ -71,6 +91,7 @@ const ReferredOrdersList: React.FC = () => {
     { id: 6, header: t("status", "Status"), key: "status" },
     { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
     { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 9, header: t("action", "Actions"), key: "actions" },
   ];
   const tableRows = useMemo(() => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
@@ -81,7 +102,7 @@ const ReferredOrdersList: React.FC = () => {
         <ConfigurableLink
           to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}
         >
-          {entry?.patient?.names[0]?.display}
+          {entry?.patient?.display.split("-")[1]}
         </ConfigurableLink>
       ),
       artNumber: entry.patient?.identifiers
@@ -107,6 +128,7 @@ const ReferredOrdersList: React.FC = () => {
       orderer: entry?.orderer?.display,
       orderType: entry?.orderType?.display,
       urgency: entry?.urgency,
+      actions: <RequestResultsAction orders={[]} />,
     }));
   }, [paginatedReferredOrderEntries]);
 
@@ -116,35 +138,37 @@ const ReferredOrdersList: React.FC = () => {
 
   if (paginatedReferredOrderEntries?.length >= 0) {
     return (
-      <DataTable rows={tableRows} headers={columns} useZebraStyles>
+      <DataTable rows={tableRows} headers={columns} useZebraStyles isSelectable>
         {({
           rows,
           headers,
           getHeaderProps,
           getTableProps,
+          getSelectionProps,
           getRowProps,
-          onInputChange,
+          selectedRows,
         }) => (
           <TableContainer className={styles.tableContainer}>
-            <TableToolbar
-              style={{
-                position: "static",
-              }}
-            >
+            <TableToolbar style={{ position: "static" }}>
               <TableToolbarContent>
-                <Layer style={{ margin: "5px" }}>
-                  <TableToolbarSearch
-                    expanded
-                    onChange={onInputChange}
-                    placeholder={t("searchThisList", "Search this list")}
+                <Layer style={{ margin: "10px" }}>
+                  <Button
+                    kind="ghost"
                     size="sm"
-                  />
+                    className={styles.button}
+                    onClick={() => handleSync(selectedRows)}
+                  >
+                    {t("sync", "Sync")}
+                  </Button>
                 </Layer>
               </TableToolbarContent>
             </TableToolbar>
+
             <Table {...getTableProps()} className={styles.activePatientsTable}>
               <TableHead>
                 <TableRow>
+                  <TableExpandHeader />
+                  <TableSelectAll {...getSelectionProps()} />
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })}>
                       {header.header?.content ?? header.header}
@@ -152,36 +176,50 @@ const ReferredOrdersList: React.FC = () => {
                   ))}
                 </TableRow>
               </TableHead>
+
               <TableBody>
-                {rows.map((row, index) => {
-                  return (
-                    <React.Fragment key={row.id}>
-                      <TableRow {...getRowProps({ row })} key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
-                            {cell.value?.content ?? cell.value}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </React.Fragment>
-                  );
-                })}
+                {rows.map((row) => (
+                  <React.Fragment key={row.id}>
+                    {/* Main Row with Expand and Select */}
+                    <TableExpandRow {...getRowProps({ row })}>
+                      <TableSelectRow {...getSelectionProps({ row })} />
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
+                      ))}
+                    </TableExpandRow>
+
+                    {/* Expanded Content Row */}
+                    {row.isExpanded && (
+                      <TableExpandedRow colSpan={headers.length + 2}>
+                        <div style={{ padding: "1rem" }}>
+                          <strong>Expanded Row for:</strong> {row.id}
+                          <p>Here you can show more detailed information or actions related to the selected row.</p>
+                        </div>
+                      </TableExpandedRow>
+                    )}
+                  </React.Fragment>
+                ))}
               </TableBody>
+
+
             </Table>
-            {rows.length === 0 ? (
+
+            {/* No Rows Message */}
+            {rows.length === 0 && (
               <div className={styles.tileContainer}>
                 <Tile className={styles.tile}>
                   <div className={styles.tileContent}>
                     <p className={styles.content}>
-                      {t(
-                        "noWorklistsToDisplay",
-                        "No worklists orders to display"
-                      )}
+                      {t("noWorklistsToDisplay", "No worklists orders to display")}
                     </p>
                   </div>
                 </Tile>
               </div>
-            ) : null}
+            )}
+
+            {/* Pagination */}
             <Pagination
               forwardText="Next page"
               backwardText="Previous page"
@@ -202,6 +240,7 @@ const ReferredOrdersList: React.FC = () => {
           </TableContainer>
         )}
       </DataTable>
+
     );
   }
 };
