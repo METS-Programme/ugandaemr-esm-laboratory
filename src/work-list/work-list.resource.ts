@@ -125,10 +125,13 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
   };
 }
 
-
 // get new refered orders
-export function useGetNewReferredOrders(fulfillerStatus: string, dateTo?: string) {
-  const customRepresentation = "v=custom:(order:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid)))),syncTask)";
+export function useGetNewReferredOrders(
+  fulfillerStatus: string,
+  dateTo?: string
+) {
+  const customRepresentation =
+    "v=custom:(order:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid)))),syncTask)";
   let apiUrl = `${restBaseUrl}/syncreferralorder?activatedOnOrAfter=${dateTo}&fullfilerStatus=${fulfillerStatus}&${customRepresentation}`;
   if (dateTo) {
     apiUrl += `&activatedOnOrAfterDate=${dateTo}`;
@@ -143,9 +146,7 @@ export function useGetNewReferredOrders(fulfillerStatus: string, dateTo?: string
       mutate(
         (key) =>
           typeof key === "string" &&
-          key.startsWith(
-            `${restBaseUrl}/syncreferralorder`
-          )
+          key.startsWith(`${restBaseUrl}/syncreferralorder`)
       ),
     []
   );
@@ -155,27 +156,25 @@ export function useGetNewReferredOrders(fulfillerStatus: string, dateTo?: string
     isLoading,
     isError: error,
     mutate: mutateReferredOrders,
-  }
+  };
 }
 
 // request results
 
-export async function SyncTestOrder (orders : string[]){
+export async function SyncTestOrder(orders: string[]) {
   const apiUrl = `${restBaseUrl}/syncTestOrder`;
 
   const payload = JSON.stringify({
     orders: orders,
-  }); 
+  });
 
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
-    method: 'POST',
+    method: "POST",
     signal: abortController.signal,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: payload,
   });
-
 }
-

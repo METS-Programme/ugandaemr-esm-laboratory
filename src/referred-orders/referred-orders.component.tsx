@@ -1,10 +1,14 @@
 import React, { useMemo, useState } from "react";
-import { useGetNewReferredOrders, useGetOrdersWorklist } from "../work-list/work-list.resource";
+import {
+  SyncTestOrder,
+  useGetNewReferredOrders,
+} from "../work-list/work-list.resource";
 import { useTranslation } from "react-i18next";
 import {
   ConfigurableLink,
   formatDate,
   parseDate,
+  showSnackbar,
   usePagination,
 } from "@openmrs/esm-framework";
 import {
@@ -27,7 +31,8 @@ import {
   Button,
   TableExpandHeader,
   TableExpandRow,
-  TableExpandedRow
+  TableExpandedRow,
+  InlineLoading,
 } from "@carbon/react";
 import { getStatusColor, useOrderDate } from "../utils/functions";
 import styles from "./referred-orders.scss";
@@ -37,8 +42,9 @@ import RequestResultsAction from "./request-order-results.component";
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
 
-  const { currentOrdersDate } = useOrderDate();
+  const [isSyncing, setIsSyncing] = useState(false);
 
+  const { currentOrdersDate } = useOrderDate();
 
   const { data: referredOrderList, isLoading } = useGetNewReferredOrders(
     "IN_PROGRESS",
@@ -50,9 +56,9 @@ const ReferredOrdersList: React.FC = () => {
 
   const filtered = referredOrderList.filter(
     (item) =>
-    item?.order?.fulfillerStatus === "IN_PROGRESS" &&
-    item?.order?.accessionNumber !== null &&
-    item?.order?.instructions === REFERINSTRUCTIONS
+      item?.order?.fulfillerStatus === "IN_PROGRESS" &&
+      item?.order?.accessionNumber !== null &&
+      item?.order?.instructions === REFERINSTRUCTIONS
   );
 
   const {
@@ -61,17 +67,47 @@ const ReferredOrdersList: React.FC = () => {
     currentPage,
   } = usePagination(filtered, currentPageSize);
 
-  const handleSync = (selectedRows: any[]) => {
+
+
+  const handleSync = async (selectedRows: any[]) => {
     if (selectedRows.length === 0) {
-      alert("No rows selected to sync (delete).");
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle: t("syncStatus", "No rows selected to sync."),
+        kind: "error",
+      });
       return;
     }
 
-    const idsToDelete = selectedRows.map((row) => row.id);
+    const idsToSync = selectedRows.map((row) => row.id);
+    setIsSyncing(true);
 
+    try {
+      const response = await SyncTestOrder(idsToSync);
 
-    // Optional: show a success message
-    alert(`Selected  ${idsToDelete} row(s)!`);
+      if (response.status === 200) {
+        showSnackbar({
+          title: t("syncSuccess", "Sync successful"),
+          subtitle: t("syncSuccess", "Test orders synced successfully."),
+          kind: "success",
+        });
+      } else {
+        showSnackbar({
+          title: t("syncStatus", "Sync Status"),
+          subtitle: t("syncFailed", "Failed to sync test orders."),
+          kind: "error",
+        });
+      }
+    } catch (error) {
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle: t("syncFailed", "An unexpected error occurred."),
+        kind: "error",
+      });
+      console.error("Sync error:", error);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
 
@@ -151,17 +187,25 @@ const ReferredOrdersList: React.FC = () => {
           <TableContainer className={styles.tableContainer}>
             <TableToolbar style={{ position: "static" }}>
               <TableToolbarContent>
-                <Layer style={{ margin: "10px" }}>
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    className={styles.button}
-                    onClick={() => handleSync(selectedRows)}
-                  >
-                    {t("sync", "Sync")}
-                  </Button>
+                <Layer style={{ margin: "10px", display: "flex", alignItems: "center", gap: "1rem" }}>
+                  {isSyncing ? (
+                    <InlineLoading
+                      description={t("syncing", "Syncing...")}
+                      status="active"
+                    />
+                  ) : (
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      className={styles.button}
+                      onClick={() => handleSync(selectedRows)}
+                    >
+                      {t("sync", "Sync")}
+                    </Button>
+                  )}
                 </Layer>
               </TableToolbarContent>
+
             </TableToolbar>
 
             <Table {...getTableProps()} className={styles.activePatientsTable}>
@@ -195,15 +239,16 @@ const ReferredOrdersList: React.FC = () => {
                       <TableExpandedRow colSpan={headers.length + 2}>
                         <div style={{ padding: "1rem" }}>
                           <strong>Expanded Row for:</strong> {row.id}
-                          <p>Here you can show more detailed information or actions related to the selected row.</p>
+                          <p>
+                            Here you can show more detailed information or
+                            actions related to the selected row.
+                          </p>
                         </div>
                       </TableExpandedRow>
                     )}
                   </React.Fragment>
                 ))}
               </TableBody>
-
-
             </Table>
 
             {/* No Rows Message */}
@@ -212,7 +257,10 @@ const ReferredOrdersList: React.FC = () => {
                 <Tile className={styles.tile}>
                   <div className={styles.tileContent}>
                     <p className={styles.content}>
-                      {t("noWorklistsToDisplay", "No worklists orders to display")}
+                      {t(
+                        "noWorklistsToDisplay",
+                        "No worklists orders to display"
+                      )}
                     </p>
                   </div>
                 </Tile>
@@ -240,7 +288,6 @@ const ReferredOrdersList: React.FC = () => {
           </TableContainer>
         )}
       </DataTable>
-
     );
   }
 };
