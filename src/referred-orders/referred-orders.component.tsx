@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useGetOrdersWorklist } from "../work-list/work-list.resource";
+import { useGetNewReferredOrders, useGetOrdersWorklist } from "../work-list/work-list.resource";
 import { useTranslation } from "react-i18next";
 import {
   ConfigurableLink,
@@ -40,9 +40,9 @@ const ReferredOrdersList: React.FC = () => {
   const { currentOrdersDate } = useOrderDate();
 
 
-  const { data: referredOrderList, isLoading } = useGetOrdersWorklist(
-    "",
-    currentOrdersDate
+  const { data: referredOrderList, isLoading } = useGetNewReferredOrders(
+    "IN_PROGRESS",
+    ""
   );
 
   const pageSizes = [10, 20, 30, 40, 50];
@@ -50,9 +50,9 @@ const ReferredOrdersList: React.FC = () => {
 
   const filtered = referredOrderList.filter(
     (item) =>
-      item?.fulfillerStatus === "IN_PROGRESS" &&
-      item?.accessionNumber !== null &&
-      item?.instructions === REFERINSTRUCTIONS
+    item?.order?.fulfillerStatus === "IN_PROGRESS" &&
+    item?.order?.accessionNumber !== null &&
+    item?.order?.instructions === REFERINSTRUCTIONS
   );
 
   const {
@@ -94,18 +94,18 @@ const ReferredOrdersList: React.FC = () => {
     { id: 9, header: t("action", "Actions"), key: "actions" },
   ];
   const tableRows = useMemo(() => {
-    return paginatedReferredOrderEntries.map((entry, index) => ({
+    return paginatedReferredOrderEntries.map((entry) => ({
       ...entry,
-      id: entry?.uuid,
-      date: formatDate(parseDate(entry?.dateActivated)),
+      id: entry?.order?.uuid,
+      date: formatDate(parseDate(entry?.order?.dateActivated)),
       patient: (
         <ConfigurableLink
-          to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}
+          to={`\${openmrsSpaBase}/patient/${entry?.order?.patient?.uuid}/chart/laboratory-orders`}
         >
-          {entry?.patient?.display.split("-")[1]}
+          {entry?.order?.patient?.display.split("-")[1]}
         </ConfigurableLink>
       ),
-      artNumber: entry.patient?.identifiers
+      artNumber: entry?.order?.patient?.identifiers
         .find(
           (item) =>
             item?.identifierType?.uuid ===
@@ -113,21 +113,21 @@ const ReferredOrdersList: React.FC = () => {
         )
         ?.display.split("=")[1]
         .trim(),
-      orderNumber: entry?.orderNumber,
-      accessionNumber: entry?.accessionNumber,
-      test: entry?.concept?.display,
-      action: entry?.action,
+      orderNumber: entry?.order?.orderNumber,
+      accessionNumber: entry?.order?.accessionNumber,
+      test: entry?.order?.concept?.display,
+      action: entry?.order?.action,
       status: (
         <span
           className={styles.statusContainer}
-          style={{ color: `${getStatusColor(entry?.fulfillerStatus)}` }}
+          style={{ color: `${getStatusColor(entry?.order?.fulfillerStatus)}` }}
         >
           {entry?.fulfillerStatus}
         </span>
       ),
-      orderer: entry?.orderer?.display,
-      orderType: entry?.orderType?.display,
-      urgency: entry?.urgency,
+      orderer: entry?.order?.orderer?.display,
+      orderType: entry?.order?.orderType?.display,
+      urgency: entry?.order?.urgency,
       actions: <RequestResultsAction orders={[]} />,
     }));
   }, [paginatedReferredOrderEntries]);
