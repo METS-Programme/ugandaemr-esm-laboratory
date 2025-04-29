@@ -67,8 +67,6 @@ const ReferredOrdersList: React.FC = () => {
     currentPage,
   } = usePagination(filtered, currentPageSize);
 
-
-
   const handleSync = async (selectedRows: any[]) => {
     if (selectedRows.length === 0) {
       showSnackbar({
@@ -109,7 +107,6 @@ const ReferredOrdersList: React.FC = () => {
       setIsSyncing(false);
     }
   };
-
 
   // table columns
   let columns = [
@@ -187,7 +184,14 @@ const ReferredOrdersList: React.FC = () => {
           <TableContainer className={styles.tableContainer}>
             <TableToolbar style={{ position: "static" }}>
               <TableToolbarContent>
-                <Layer style={{ margin: "10px", display: "flex", alignItems: "center", gap: "1rem" }}>
+                <Layer
+                  style={{
+                    margin: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
                   {isSyncing ? (
                     <InlineLoading
                       description={t("syncing", "Syncing...")}
@@ -205,7 +209,6 @@ const ReferredOrdersList: React.FC = () => {
                   )}
                 </Layer>
               </TableToolbarContent>
-
             </TableToolbar>
 
             <Table {...getTableProps()} className={styles.activePatientsTable}>
