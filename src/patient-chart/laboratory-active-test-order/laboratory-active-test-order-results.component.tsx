@@ -77,12 +77,8 @@ const LaboratoryActiveTestOrderResults: React.FC<
 > = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const {
-    enableSendingLabTestsByEmail,
-    laboratoryEncounterTypeUuid,
-    artCardEncounterTypeUuid,
-    laboratoryOrderTypeUuid,
-  } = useConfig();
+  const { enableSendingLabTestsByEmail, laboratoryEncounterTypeUuid } =
+    useConfig();
 
   const displayText = t(
     "activelLaboratoryTestsDisplayTextTitle",

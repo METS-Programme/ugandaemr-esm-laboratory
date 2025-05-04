@@ -26,7 +26,6 @@ import {
 } from "@carbon/react";
 import { getStatusColor, useOrderDate } from "../utils/functions";
 import styles from "./referred-orders.scss";
-import dayjs from "dayjs";
 import { REFERINSTRUCTIONS } from "../constants";
 
 const ReferredOrdersList: React.FC = () => {
