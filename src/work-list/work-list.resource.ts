@@ -90,7 +90,7 @@ export interface IdentifierType {
 export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
   const { laboratoryOrderTypeUuid } = useConfig();
   const customRepresentation =
-    "v=custom:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid))))";
+    "v=custom:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display,names)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid))))";
   const orderTypeQuery =
     laboratoryOrderTypeUuid !== ""
       ? `orderTypes=${laboratoryOrderTypeUuid}`

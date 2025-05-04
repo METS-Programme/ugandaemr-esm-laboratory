@@ -136,7 +136,7 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
         <ConfigurableLink
           to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}
         >
-          {entry?.patient?.display.split("-")[1]}
+          {entry?.patient?.names[0]?.display}
         </ConfigurableLink>
       ),
       orderNumber: entry?.orderNumber,

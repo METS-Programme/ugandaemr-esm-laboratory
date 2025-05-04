@@ -57,13 +57,12 @@ const RejectedTestsList: React.FC = () => {
       key: "accessionNumber",
     },
     { id: 4, header: t("patient", "Patient"), key: "patient" },
-    { id: 5, header: t("artNumber", "Art Number"), key: "artNumber" },
 
-    { id: 6, header: t("test", "Test"), key: "test" },
-    { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
-    { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 5, header: t("test", "Test"), key: "test" },
+    { id: 6, header: t("orderer", "Ordered By"), key: "orderer" },
+    { id: 7, header: t("urgency", "Urgency"), key: "urgency" },
     {
-      id: 9,
+      id: 8,
       header: t("fulfillerComment", "Reason for Rejection"),
       key: "fulfillerComment",
     },
@@ -78,7 +77,7 @@ const RejectedTestsList: React.FC = () => {
           {formatDate(parseDate(entry?.dateActivated))}
         </span>
       ),
-      patient: entry?.patient?.display.split("-")[1],
+      patient: entry?.patient?.names[0]?.display,
       artNumber: entry.patient?.identifiers
         .find(
           (item) =>

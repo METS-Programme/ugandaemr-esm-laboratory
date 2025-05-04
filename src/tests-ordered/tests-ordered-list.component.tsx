@@ -80,7 +80,7 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
             {formatDate(parseDate(entry?.dateActivated))}
           </span>
         ),
-        patient: entry?.patient?.display.split("-")[1],
+        patient: entry?.patient?.names[0]?.display,
         artNumber: entry.patient?.identifiers
           .find(
             (item) =>

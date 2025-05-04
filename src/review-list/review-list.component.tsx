@@ -115,7 +115,7 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
       ...entry,
       id: entry?.uuid,
       date: formatDate(parseDate(entry?.dateActivated)),
-      patient: entry?.patient?.display.split("-")[1],
+      patient: entry?.patient?.names[0]?.display,
       orderNumber: entry?.orderNumber,
       artNumber: entry.patient?.identifiers
         .find(
