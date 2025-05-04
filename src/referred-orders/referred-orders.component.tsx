@@ -28,6 +28,7 @@ import { getStatusColor, useOrderDate } from "../utils/functions";
 import styles from "./referred-orders.scss";
 import dayjs from "dayjs";
 import { REFERINSTRUCTIONS } from "../constants";
+import EditReferredOrders from "./edit-referred-orders-button.component";
 
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
@@ -71,6 +72,7 @@ const ReferredOrdersList: React.FC = () => {
     { id: 6, header: t("status", "Status"), key: "status" },
     { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
     { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 9, header: t("actions", "Actions"), key: "actions" },
   ];
   const tableRows = useMemo(() => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
@@ -107,6 +109,9 @@ const ReferredOrdersList: React.FC = () => {
       orderer: entry?.orderer?.display,
       orderType: entry?.orderType?.display,
       urgency: entry?.urgency,
+      actions: (
+        <EditReferredOrders order={paginatedReferredOrderEntries[index]} />
+      ),
     }));
   }, [paginatedReferredOrderEntries]);
 
