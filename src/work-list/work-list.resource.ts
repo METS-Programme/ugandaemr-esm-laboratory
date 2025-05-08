@@ -126,13 +126,10 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
 }
 
 // get new refered orders
-export function useGetNewReferredOrders(
-  fulfillerStatus: string,
-  dateTo?: string
-) {
+export function useGetNewReferredOrders(dateTo?: string) {
   const customRepresentation =
     "v=custom:(order:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid)))),syncTask)";
-  let apiUrl = `${restBaseUrl}/syncreferralorder?activatedOnOrAfter=${dateTo}&fullfilerStatus=${fulfillerStatus}&${customRepresentation}`;
+  let apiUrl = `${restBaseUrl}/syncreferralorder?${customRepresentation}`;
   if (dateTo) {
     apiUrl += `&activatedOnOrAfterDate=${dateTo}`;
   }

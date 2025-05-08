@@ -1,8 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  SyncTestOrder,
-  useGetNewReferredOrders,
-} from "../work-list/work-list.resource";
+import { useGetNewReferredOrders } from "../work-list/work-list.resource";
 import { useTranslation } from "react-i18next";
 import {
   ConfigurableLink,
@@ -33,11 +30,21 @@ import {
   TableExpandRow,
   TableExpandedRow,
   InlineLoading,
+  TableToolbarSearch,
 } from "@carbon/react";
-import { getStatusColor, useOrderDate } from "../utils/functions";
+import {
+  extractErrorMessagesFromResponse,
+  getStatusColor,
+  useOrderDate,
+} from "../utils/functions";
 import styles from "./referred-orders.scss";
-import { REFERINSTRUCTIONS } from "../constants";
 import RequestResultsAction from "./request-order-results.component";
+import {
+  getAllTestOrderResults,
+  syncAllTestOrders,
+  syncSelectedTestOrderResults,
+  syncSelectedTestOrders,
+} from "./referred-orders.resource";
 
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
@@ -46,28 +53,22 @@ const ReferredOrdersList: React.FC = () => {
 
   const { currentOrdersDate } = useOrderDate();
 
-  const { data: referredOrderList, isLoading } = useGetNewReferredOrders(
-    "IN_PROGRESS",
-    ""
-  );
+  const { data: referredOrderList, isLoading } = useGetNewReferredOrders("");
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
 
-  const filtered = referredOrderList.filter(
-    (item) =>
-      item?.order?.fulfillerStatus === "IN_PROGRESS" &&
-      item?.order?.accessionNumber !== null &&
-      item?.order?.instructions === REFERINSTRUCTIONS
-  );
+  // const filtered = referredOrderList.filter(
+  //   (item) => item?.order?.instructions === REFERINSTRUCTIONS
+  // );
 
   const {
     goTo,
     results: paginatedReferredOrderEntries,
     currentPage,
-  } = usePagination(filtered, currentPageSize);
+  } = usePagination(referredOrderList, currentPageSize);
 
-  const handleSync = async (selectedRows: any[]) => {
+  const handleSyncSelectedOrders = async (selectedRows: any[]) => {
     if (selectedRows.length === 0) {
       showSnackbar({
         title: t("syncStatus", "Sync Status"),
@@ -81,28 +82,151 @@ const ReferredOrdersList: React.FC = () => {
     setIsSyncing(true);
 
     try {
-      const response = await SyncTestOrder(idsToSync);
+      const response = await syncSelectedTestOrders(idsToSync);
 
-      if (response.status === 200) {
-        showSnackbar({
-          title: t("syncSuccess", "Sync successful"),
-          subtitle: t("syncSuccess", "Test orders synced successfully."),
-          kind: "success",
-        });
-      } else {
-        showSnackbar({
-          title: t("syncStatus", "Sync Status"),
-          subtitle: t("syncFailed", "Failed to sync test orders."),
-          kind: "error",
-        });
-      }
+      const isSuccess = response.status === 200;
+
+      showSnackbar({
+        title: isSuccess
+          ? t("syncSuccess", "Sync successful")
+          : t("syncStatus", "Sync Status"),
+        subtitle: isSuccess
+          ? t("syncSuccess", "Test orders synced successfully.")
+          : t(
+              "syncFailed",
+              `Failed to sync test orders. ${
+                response?.data?.responseList?.[0]?.responseMessage || ""
+              }`
+            ),
+        kind: isSuccess ? "success" : "error",
+      });
     } catch (error) {
+      const errorMessages = extractErrorMessagesFromResponse(error);
       showSnackbar({
         title: t("syncStatus", "Sync Status"),
-        subtitle: t("syncFailed", "An unexpected error occurred."),
+        subtitle:
+          errorMessages.join(", ") ||
+          t("syncFailed", "An unexpected error occurred."),
         kind: "error",
       });
-      console.error("Sync error:", error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleSyncSelectedTestOrderResults = async (selectedRows: any[]) => {
+    if (selectedRows.length === 0) {
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle: t("syncStatus", "No rows selected to sync."),
+        kind: "error",
+      });
+      return;
+    }
+
+    const idsToSync = selectedRows.map((row) => row.id);
+    setIsSyncing(true);
+
+    try {
+      const response = await syncSelectedTestOrderResults(idsToSync);
+
+      const isSuccess = response.status === 200;
+
+      showSnackbar({
+        title: isSuccess
+          ? t("syncSuccess", "Sync successful")
+          : t("syncStatus", "Sync Status"),
+        subtitle: isSuccess
+          ? t("syncSuccess", "Test orders results synced successfully.")
+          : t(
+              "syncFailed",
+              `Failed to sync test result orders. ${
+                response?.data?.responseList?.[0]?.responseMessage || ""
+              }`
+            ),
+        kind: isSuccess ? "success" : "error",
+      });
+    } catch (error) {
+      const errorMessages = extractErrorMessagesFromResponse(error);
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle:
+          errorMessages.join(", ") ||
+          t("syncFailed", "An unexpected error occurred."),
+        kind: "error",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleSyncAllTestOrders = async () => {
+    setIsSyncing(true);
+
+    try {
+      const response = await syncAllTestOrders();
+
+      const isSuccess = response.status === 200;
+
+      showSnackbar({
+        title: isSuccess
+          ? t("syncSuccess", "Sync successful")
+          : t("syncStatus", "Sync Status"),
+        subtitle: isSuccess
+          ? t("syncSuccess", "Test orders  synced successfully.")
+          : t(
+              "syncFailed",
+              `Failed to sync test  orders. ${
+                response?.data?.responseList?.[0]?.responseMessage || ""
+              }`
+            ),
+        kind: isSuccess ? "success" : "error",
+      });
+    } catch (error) {
+      const errorMessages = extractErrorMessagesFromResponse(error);
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle:
+          errorMessages.join(", ") ||
+          t("syncFailed", "An unexpected error occurred."),
+        kind: "error",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleSyncAllTestOrderResults = async () => {
+    setIsSyncing(true);
+
+    try {
+      const response = await getAllTestOrderResults();
+
+      const isSuccess = response.status === 200;
+
+      showSnackbar({
+        title: isSuccess
+          ? t("syncSuccess", "Sync successful")
+          : t("syncStatus", "Sync Status"),
+        subtitle: isSuccess
+          ? t("syncSuccess", "Test orders results synced successfully.")
+          : t(
+              "syncFailed",
+              `Failed to sync test result orders. ${
+                response?.data?.responseList?.[0]?.responseMessage || ""
+              }`
+            ),
+        kind: isSuccess ? "success" : "error",
+      });
+    } catch (error) {
+      const errorMessages = extractErrorMessagesFromResponse(error);
+      showSnackbar({
+        title: t("syncStatus", "Sync Status"),
+        subtitle:
+          errorMessages.join(", ") ||
+          t("syncFailed", "An unexpected error occurred."),
+        kind: "error",
+      });
     } finally {
       setIsSyncing(false);
     }
@@ -127,7 +251,7 @@ const ReferredOrdersList: React.FC = () => {
     { id: 9, header: t("action", "Actions"), key: "actions" },
   ];
   const tableRows = useMemo(() => {
-    return paginatedReferredOrderEntries.map((entry) => ({
+    return paginatedReferredOrderEntries.map((entry, index) => ({
       ...entry,
       id: entry?.order?.uuid,
       date: formatDate(parseDate(entry?.order?.dateActivated)),
@@ -161,7 +285,9 @@ const ReferredOrdersList: React.FC = () => {
       orderer: entry?.order?.orderer?.display,
       orderType: entry?.order?.orderType?.display,
       urgency: entry?.order?.urgency,
-      actions: <RequestResultsAction orders={[]} />,
+      actions: (
+        <RequestResultsAction orders={paginatedReferredOrderEntries[index]} />
+      ),
     }));
   }, [paginatedReferredOrderEntries]);
 
@@ -180,16 +306,15 @@ const ReferredOrdersList: React.FC = () => {
           getSelectionProps,
           getRowProps,
           selectedRows,
+          onInputChange,
         }) => (
           <TableContainer className={styles.tableContainer}>
             <TableToolbar style={{ position: "static" }}>
               <TableToolbarContent>
+                {/* selected implementation */}
                 <Layer
                   style={{
-                    margin: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1rem",
+                    margin: "5px",
                   }}
                 >
                   {isSyncing ? (
@@ -199,14 +324,87 @@ const ReferredOrdersList: React.FC = () => {
                     />
                   ) : (
                     <Button
-                      kind="ghost"
                       size="sm"
                       className={styles.button}
-                      onClick={() => handleSync(selectedRows)}
+                      onClick={() => handleSyncSelectedOrders(selectedRows)}
                     >
-                      {t("sync", "Sync")}
+                      {t("syncSelected", "Sync Selected Orders")}
                     </Button>
                   )}
+                </Layer>
+                <Layer
+                  style={{
+                    margin: "5px",
+                  }}
+                >
+                  {isSyncing ? (
+                    <InlineLoading
+                      description={t("syncing", "Syncing...")}
+                      status="active"
+                    />
+                  ) : (
+                    <Button
+                      size="sm"
+                      className={styles.button}
+                      onClick={() =>
+                        handleSyncSelectedTestOrderResults(selectedRows)
+                      }
+                    >
+                      {t("resultsForSelected", "Get Results For Selected")}
+                    </Button>
+                  )}
+                </Layer>
+                {/* all implementation */}
+                <Layer
+                  style={{
+                    margin: "5px",
+                  }}
+                >
+                  {isSyncing ? (
+                    <InlineLoading
+                      description={t("syncing", "Syncing...")}
+                      status="active"
+                    />
+                  ) : (
+                    <Button
+                      size="sm"
+                      className={styles.button}
+                      onclick={() => {
+                        handleSyncAllTestOrderResults;
+                      }}
+                    >
+                      {t("syncAllResults", "Get All Results")}
+                    </Button>
+                  )}
+                </Layer>
+                <Layer
+                  style={{
+                    margin: "5px",
+                  }}
+                >
+                  {isSyncing ? (
+                    <InlineLoading
+                      description={t("syncing", "Syncing...")}
+                      status="active"
+                    />
+                  ) : (
+                    <Button
+                      size="sm"
+                      className={styles.button}
+                      onclick={handleSyncAllTestOrders}
+                    >
+                      {t("syncAll", "Sync All Orders")}
+                    </Button>
+                  )}
+                </Layer>
+
+                <Layer style={{ margin: "5px" }}>
+                  <TableToolbarSearch
+                    expanded
+                    onChange={onInputChange}
+                    placeholder={t("searchThisList", "Search this list")}
+                    size="sm"
+                  />
                 </Layer>
               </TableToolbarContent>
             </TableToolbar>
@@ -225,7 +423,7 @@ const ReferredOrdersList: React.FC = () => {
               </TableHead>
 
               <TableBody>
-                {rows.map((row) => (
+                {rows.map((row, index) => (
                   <React.Fragment key={row.id}>
                     {/* Main Row with Expand and Select */}
                     <TableExpandRow {...getRowProps({ row })}>
@@ -241,11 +439,10 @@ const ReferredOrdersList: React.FC = () => {
                     {row.isExpanded && (
                       <TableExpandedRow colSpan={headers.length + 2}>
                         <div style={{ padding: "1rem" }}>
-                          <strong>Expanded Row for:</strong> {row.id}
-                          <p>
-                            Here you can show more detailed information or
-                            actions related to the selected row.
-                          </p>
+                          {paginatedReferredOrderEntries[index]?.syncTask ===
+                          null
+                            ? "Not Synced"
+                            : "Synced"}
                         </div>
                       </TableExpandedRow>
                     )}
@@ -277,7 +474,7 @@ const ReferredOrdersList: React.FC = () => {
               page={currentPage}
               pageSize={currentPageSize}
               pageSizes={pageSizes}
-              totalItems={filtered?.length}
+              totalItems={referredOrderList?.length}
               className={styles.pagination}
               onChange={({ pageSize, page }) => {
                 if (pageSize !== currentPageSize) {

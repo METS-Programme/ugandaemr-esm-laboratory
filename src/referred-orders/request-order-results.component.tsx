@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, InlineLoading } from "@carbon/react";
-import { SyncTestOrder } from "../work-list/work-list.resource";
 import { showSnackbar } from "@openmrs/esm-framework";
+import { syncSelectedTestOrders } from "./referred-orders.resource";
 
 interface RequestResultsActionProps {
   orders: string[];
@@ -27,7 +27,7 @@ const RequestResultsAction: React.FC<RequestResultsActionProps> = ({
       setIsSubmitting(true);
       setIsSuccess(false);
 
-      const response = await SyncTestOrder(orders);
+      const response = await syncSelectedTestOrders(orders);
 
       if (response.status === 201) {
         showSnackbar({
