@@ -91,27 +91,20 @@ const ReferredOrdersList: React.FC = () => {
 
     await syncSelectedTestOrders(idsToSync)
       .then((res) => {
-        const isSuccess = res.status === 200;
+        if (![200, 201].includes(res.status)) {
+          const message =
+            res?.data?.responseList?.[0]?.responseMessage ||
+            t("syncFailed", "Failed to sync test orders.");
+          throw new Error(message);
+        }
 
         showSnackbar({
-          title: isSuccess
-            ? t("syncSuccess", "Sync successful")
-            : t("syncStatus", "Sync Status"),
-          subtitle: isSuccess
-            ? t("syncSuccess", "Test orders synced successfully.")
-            : t(
-                "syncFailed",
-                `Failed to sync test orders. ${
-                  res?.data?.responseList?.[0]?.responseMessage || ""
-                }`
-              ),
-          kind: isSuccess ? "success" : "error",
+          title: t("syncSuccess", "Sync successful"),
+          subtitle: t("syncSuccess", "Test orders synced successfully."),
+          kind: "success",
         });
-        setIsSyncingSelectedTestOrders(false);
       })
       .catch((error) => {
-        setIsSyncingSelectedTestOrders(false);
-
         const errorMessages = extractErrorMessagesFromResponse(error);
         showSnackbar({
           title: t("syncStatus", "Sync Status"),
@@ -120,6 +113,9 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+      })
+      .finally(() => {
+        setIsSyncingSelectedTestOrders(false);
       });
   };
 
@@ -138,26 +134,23 @@ const ReferredOrdersList: React.FC = () => {
 
     await syncSelectedTestOrderResults(idsToSync)
       .then((res) => {
-        const isSuccess = res.status === 200;
+        if (![200, 201].includes(res.status)) {
+          const message =
+            res?.data?.responseList?.[0]?.responseMessage ||
+            t("syncFailed", "Failed to sync test result orders.");
+          throw new Error(message);
+        }
 
         showSnackbar({
-          title: isSuccess
-            ? t("syncSuccess", "Sync successful")
-            : t("syncStatus", "Sync Status"),
-          subtitle: isSuccess
-            ? t("syncSuccess", "Test orders results synced successfully.")
-            : t(
-                "syncFailed",
-                `Failed to sync test result orders. ${
-                  res?.data?.responseList?.[0]?.responseMessage || ""
-                }`
-              ),
-          kind: isSuccess ? "success" : "error",
+          title: t("syncSuccess", "Sync successful"),
+          subtitle: t(
+            "syncSuccess",
+            "Test orders results synced successfully."
+          ),
+          kind: "success",
         });
-        setIsSyncingSelectedTestOrderResults(false);
       })
       .catch((error) => {
-        setIsSyncingSelectedTestOrderResults(false);
         const errorMessages = extractErrorMessagesFromResponse(error);
         showSnackbar({
           title: t("syncStatus", "Sync Status"),
@@ -166,6 +159,9 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+      })
+      .finally(() => {
+        setIsSyncingSelectedTestOrderResults(false);
       });
   };
 
@@ -174,23 +170,18 @@ const ReferredOrdersList: React.FC = () => {
 
     await syncAllTestOrders()
       .then((res) => {
-        const isSuccess = res.status === 200;
+        if (![200, 201].includes(res.status)) {
+          const message =
+            res?.data?.responseList?.[0]?.responseMessage ||
+            "Failed to sync test orders.";
+          throw new Error(message);
+        }
 
         showSnackbar({
-          title: isSuccess
-            ? t("syncSuccess", "Sync successful")
-            : t("syncStatus", "Sync Status"),
-          subtitle: isSuccess
-            ? t("syncSuccess", "Test orders  synced successfully.")
-            : t(
-                "syncFailed",
-                `Failed to sync test  orders. ${
-                  res?.data?.responseList?.[0]?.responseMessage || ""
-                }`
-              ),
-          kind: isSuccess ? "success" : "error",
+          title: t("syncSuccess", "Sync successful"),
+          subtitle: t("syncSuccess", "Test orders synced successfully."),
+          kind: "success",
         });
-        setIsSyncingAllTestOrders(false);
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -201,6 +192,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+      })
+      .finally(() => {
         setIsSyncingAllTestOrders(false);
       });
   };
@@ -210,23 +203,18 @@ const ReferredOrdersList: React.FC = () => {
 
     await getAllTestOrderResults()
       .then((res) => {
-        const isSuccess = res.status === 200;
+        if (![200, 201].includes(res.status)) {
+          const message =
+            res?.data?.responseList?.[0]?.responseMessage ||
+            "Failed to sync test orders.";
+          throw new Error(message);
+        }
 
         showSnackbar({
-          title: isSuccess
-            ? t("syncSuccess", "Sync successful")
-            : t("syncStatus", "Sync Status"),
-          subtitle: isSuccess
-            ? t("syncSuccess", "Test orders results synced successfully.")
-            : t(
-                "syncFailed",
-                `Failed to sync test result orders. ${
-                  res?.data?.responseList?.[0]?.responseMessage || ""
-                }`
-              ),
-          kind: isSuccess ? "success" : "error",
+          title: t("syncSuccess", "Sync successful"),
+          subtitle: t("syncSuccess", "Test order results synced successfully."),
+          kind: "success",
         });
-        setIsSyncingAllTestOrderResults(false);
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -237,6 +225,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+      })
+      .finally(() => {
         setIsSyncingAllTestOrderResults(false);
       });
   };
