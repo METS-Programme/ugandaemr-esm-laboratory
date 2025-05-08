@@ -5,7 +5,7 @@ export async function getAllTestOrderResults() {
     action: "RUNTASK",
     tasks: ["Request Viral Results"],
   };
-  const apiUrl = `${restBaseUrl}/ws/rest/v1/taskaction`;
+  const apiUrl = `${restBaseUrl}/taskaction`;
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
     method: "POST",
@@ -22,7 +22,7 @@ export async function syncAllTestOrders() {
     action: "RUNTASK",
     tasks: ["Send Viral Load Request to Central Server Task"],
   };
-  const apiUrl = `${restBaseUrl}/ws/rest/v1/taskaction`;
+  const apiUrl = `${restBaseUrl}/taskaction`;
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
     method: "POST",

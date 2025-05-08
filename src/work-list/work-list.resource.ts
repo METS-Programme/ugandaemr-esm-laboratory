@@ -115,7 +115,7 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
   const { data, error, isLoading } = useSWR<
     { data: { results: Array<Result> } },
     Error
-  >(apiUrl, openmrsFetch, { refreshInterval: 3000 });
+  >(apiUrl, openmrsFetch);
 
   return {
     data: data?.data ? data.data.results : [],
@@ -124,7 +124,6 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
     mutate: mutateOrders,
   };
 }
-
 
 // get new refered orders
 export function useGetNewReferredOrders(dateTo?: string) {
@@ -156,4 +155,3 @@ export function useGetNewReferredOrders(dateTo?: string) {
     mutate: mutateReferredOrders,
   };
 }
-

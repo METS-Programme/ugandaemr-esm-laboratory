@@ -58,7 +58,7 @@ export function useLabTestsStats(fulfillerStatus: string, date?: string) {
   const { data, error, isLoading, mutate } = useSWR<
     { data: { results: Array<Result> } },
     Error
-  >(apiUrl, openmrsFetch, { refreshInterval: 3000 });
+  >(apiUrl, openmrsFetch);
   return {
     data: data?.data ? data?.data?.results : [],
     isLoading,

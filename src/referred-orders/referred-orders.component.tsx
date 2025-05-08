@@ -49,18 +49,26 @@ import {
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
 
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncingAllTestOrders, setIsSyncingAllTestOrders] = useState(false);
+
+  const [isSyncingAllTestOrderResults, setIsSyncingAllTestOrderResults] =
+    useState(false);
+
+  const [isSyncingSelectedTestOrders, setIsSyncingSelectedTestOrders] =
+    useState(false);
+
+  const [
+    isSyncingSelectedTestOrderResults,
+    setIsSyncingSelectedTestOrderResults,
+  ] = useState(false);
 
   const { currentOrdersDate } = useOrderDate();
 
   const { data: referredOrderList, isLoading } = useGetNewReferredOrders("");
 
   const pageSizes = [10, 20, 30, 40, 50];
-  const [currentPageSize, setPageSize] = useState(10);
 
-  // const filtered = referredOrderList.filter(
-  //   (item) => item?.order?.instructions === REFERINSTRUCTIONS
-  // );
+  const [currentPageSize, setPageSize] = useState(10);
 
   const {
     goTo,
@@ -68,7 +76,7 @@ const ReferredOrdersList: React.FC = () => {
     currentPage,
   } = usePagination(referredOrderList, currentPageSize);
 
-  const handleSyncSelectedOrders = async (selectedRows: any[]) => {
+  const handleSyncSelectedTestOrders = async (selectedRows: any[]) => {
     if (selectedRows.length === 0) {
       showSnackbar({
         title: t("syncStatus", "Sync Status"),
@@ -79,39 +87,40 @@ const ReferredOrdersList: React.FC = () => {
     }
 
     const idsToSync = selectedRows.map((row) => row.id);
-    setIsSyncing(true);
+    setIsSyncingSelectedTestOrders(true);
 
-    try {
-      const response = await syncSelectedTestOrders(idsToSync);
+    await syncSelectedTestOrders(idsToSync)
+      .then((res) => {
+        const isSuccess = res.status === 200;
 
-      const isSuccess = response.status === 200;
+        showSnackbar({
+          title: isSuccess
+            ? t("syncSuccess", "Sync successful")
+            : t("syncStatus", "Sync Status"),
+          subtitle: isSuccess
+            ? t("syncSuccess", "Test orders synced successfully.")
+            : t(
+                "syncFailed",
+                `Failed to sync test orders. ${
+                  res?.data?.responseList?.[0]?.responseMessage || ""
+                }`
+              ),
+          kind: isSuccess ? "success" : "error",
+        });
+        setIsSyncingSelectedTestOrders(false);
+      })
+      .catch((error) => {
+        setIsSyncingSelectedTestOrders(false);
 
-      showSnackbar({
-        title: isSuccess
-          ? t("syncSuccess", "Sync successful")
-          : t("syncStatus", "Sync Status"),
-        subtitle: isSuccess
-          ? t("syncSuccess", "Test orders synced successfully.")
-          : t(
-              "syncFailed",
-              `Failed to sync test orders. ${
-                response?.data?.responseList?.[0]?.responseMessage || ""
-              }`
-            ),
-        kind: isSuccess ? "success" : "error",
+        const errorMessages = extractErrorMessagesFromResponse(error);
+        showSnackbar({
+          title: t("syncStatus", "Sync Status"),
+          subtitle:
+            errorMessages.join(", ") ||
+            t("syncFailed", "An unexpected error occurred."),
+          kind: "error",
+        });
       });
-    } catch (error) {
-      const errorMessages = extractErrorMessagesFromResponse(error);
-      showSnackbar({
-        title: t("syncStatus", "Sync Status"),
-        subtitle:
-          errorMessages.join(", ") ||
-          t("syncFailed", "An unexpected error occurred."),
-        kind: "error",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   const handleSyncSelectedTestOrderResults = async (selectedRows: any[]) => {
@@ -125,111 +134,111 @@ const ReferredOrdersList: React.FC = () => {
     }
 
     const idsToSync = selectedRows.map((row) => row.id);
-    setIsSyncing(true);
+    setIsSyncingSelectedTestOrderResults(true);
 
-    try {
-      const response = await syncSelectedTestOrderResults(idsToSync);
+    await syncSelectedTestOrderResults(idsToSync)
+      .then((res) => {
+        const isSuccess = res.status === 200;
 
-      const isSuccess = response.status === 200;
-
-      showSnackbar({
-        title: isSuccess
-          ? t("syncSuccess", "Sync successful")
-          : t("syncStatus", "Sync Status"),
-        subtitle: isSuccess
-          ? t("syncSuccess", "Test orders results synced successfully.")
-          : t(
-              "syncFailed",
-              `Failed to sync test result orders. ${
-                response?.data?.responseList?.[0]?.responseMessage || ""
-              }`
-            ),
-        kind: isSuccess ? "success" : "error",
+        showSnackbar({
+          title: isSuccess
+            ? t("syncSuccess", "Sync successful")
+            : t("syncStatus", "Sync Status"),
+          subtitle: isSuccess
+            ? t("syncSuccess", "Test orders results synced successfully.")
+            : t(
+                "syncFailed",
+                `Failed to sync test result orders. ${
+                  res?.data?.responseList?.[0]?.responseMessage || ""
+                }`
+              ),
+          kind: isSuccess ? "success" : "error",
+        });
+        setIsSyncingSelectedTestOrderResults(false);
+      })
+      .catch((error) => {
+        setIsSyncingSelectedTestOrderResults(false);
+        const errorMessages = extractErrorMessagesFromResponse(error);
+        showSnackbar({
+          title: t("syncStatus", "Sync Status"),
+          subtitle:
+            errorMessages.join(", ") ||
+            t("syncFailed", "An unexpected error occurred."),
+          kind: "error",
+        });
       });
-    } catch (error) {
-      const errorMessages = extractErrorMessagesFromResponse(error);
-      showSnackbar({
-        title: t("syncStatus", "Sync Status"),
-        subtitle:
-          errorMessages.join(", ") ||
-          t("syncFailed", "An unexpected error occurred."),
-        kind: "error",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   const handleSyncAllTestOrders = async () => {
-    setIsSyncing(true);
+    setIsSyncingAllTestOrders(true);
 
-    try {
-      const response = await syncAllTestOrders();
+    await syncAllTestOrders()
+      .then((res) => {
+        const isSuccess = res.status === 200;
 
-      const isSuccess = response.status === 200;
-
-      showSnackbar({
-        title: isSuccess
-          ? t("syncSuccess", "Sync successful")
-          : t("syncStatus", "Sync Status"),
-        subtitle: isSuccess
-          ? t("syncSuccess", "Test orders  synced successfully.")
-          : t(
-              "syncFailed",
-              `Failed to sync test  orders. ${
-                response?.data?.responseList?.[0]?.responseMessage || ""
-              }`
-            ),
-        kind: isSuccess ? "success" : "error",
+        showSnackbar({
+          title: isSuccess
+            ? t("syncSuccess", "Sync successful")
+            : t("syncStatus", "Sync Status"),
+          subtitle: isSuccess
+            ? t("syncSuccess", "Test orders  synced successfully.")
+            : t(
+                "syncFailed",
+                `Failed to sync test  orders. ${
+                  res?.data?.responseList?.[0]?.responseMessage || ""
+                }`
+              ),
+          kind: isSuccess ? "success" : "error",
+        });
+        setIsSyncingAllTestOrders(false);
+      })
+      .catch((error) => {
+        const errorMessages = extractErrorMessagesFromResponse(error);
+        showSnackbar({
+          title: t("syncStatus", "Sync Status"),
+          subtitle:
+            errorMessages.join(", ") ||
+            t("syncFailed", "An unexpected error occurred."),
+          kind: "error",
+        });
+        setIsSyncingAllTestOrders(false);
       });
-    } catch (error) {
-      const errorMessages = extractErrorMessagesFromResponse(error);
-      showSnackbar({
-        title: t("syncStatus", "Sync Status"),
-        subtitle:
-          errorMessages.join(", ") ||
-          t("syncFailed", "An unexpected error occurred."),
-        kind: "error",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   const handleSyncAllTestOrderResults = async () => {
-    setIsSyncing(true);
+    setIsSyncingAllTestOrderResults(true);
 
-    try {
-      const response = await getAllTestOrderResults();
+    await getAllTestOrderResults()
+      .then((res) => {
+        const isSuccess = res.status === 200;
 
-      const isSuccess = response.status === 200;
-
-      showSnackbar({
-        title: isSuccess
-          ? t("syncSuccess", "Sync successful")
-          : t("syncStatus", "Sync Status"),
-        subtitle: isSuccess
-          ? t("syncSuccess", "Test orders results synced successfully.")
-          : t(
-              "syncFailed",
-              `Failed to sync test result orders. ${
-                response?.data?.responseList?.[0]?.responseMessage || ""
-              }`
-            ),
-        kind: isSuccess ? "success" : "error",
+        showSnackbar({
+          title: isSuccess
+            ? t("syncSuccess", "Sync successful")
+            : t("syncStatus", "Sync Status"),
+          subtitle: isSuccess
+            ? t("syncSuccess", "Test orders results synced successfully.")
+            : t(
+                "syncFailed",
+                `Failed to sync test result orders. ${
+                  res?.data?.responseList?.[0]?.responseMessage || ""
+                }`
+              ),
+          kind: isSuccess ? "success" : "error",
+        });
+        setIsSyncingAllTestOrderResults(false);
+      })
+      .catch((error) => {
+        const errorMessages = extractErrorMessagesFromResponse(error);
+        showSnackbar({
+          title: t("syncStatus", "Sync Status"),
+          subtitle:
+            errorMessages.join(", ") ||
+            t("syncFailed", "An unexpected error occurred."),
+          kind: "error",
+        });
+        setIsSyncingAllTestOrderResults(false);
       });
-    } catch (error) {
-      const errorMessages = extractErrorMessagesFromResponse(error);
-      showSnackbar({
-        title: t("syncStatus", "Sync Status"),
-        subtitle:
-          errorMessages.join(", ") ||
-          t("syncFailed", "An unexpected error occurred."),
-        kind: "error",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   // table columns
@@ -317,7 +326,7 @@ const ReferredOrdersList: React.FC = () => {
                     margin: "5px",
                   }}
                 >
-                  {isSyncing ? (
+                  {isSyncingSelectedTestOrders ? (
                     <InlineLoading
                       description={t("syncing", "Syncing...")}
                       status="active"
@@ -326,7 +335,7 @@ const ReferredOrdersList: React.FC = () => {
                     <Button
                       size="sm"
                       className={styles.button}
-                      onClick={() => handleSyncSelectedOrders(selectedRows)}
+                      onClick={() => handleSyncSelectedTestOrders(selectedRows)}
                     >
                       {t("syncSelected", "Sync Selected Orders")}
                     </Button>
@@ -337,7 +346,7 @@ const ReferredOrdersList: React.FC = () => {
                     margin: "5px",
                   }}
                 >
-                  {isSyncing ? (
+                  {isSyncingSelectedTestOrderResults ? (
                     <InlineLoading
                       description={t("syncing", "Syncing...")}
                       status="active"
@@ -360,7 +369,7 @@ const ReferredOrdersList: React.FC = () => {
                     margin: "5px",
                   }}
                 >
-                  {isSyncing ? (
+                  {isSyncingAllTestOrderResults ? (
                     <InlineLoading
                       description={t("syncing", "Syncing...")}
                       status="active"
@@ -369,8 +378,8 @@ const ReferredOrdersList: React.FC = () => {
                     <Button
                       size="sm"
                       className={styles.button}
-                      onclick={() => {
-                        handleSyncAllTestOrderResults;
+                      onClick={() => {
+                        handleSyncAllTestOrderResults();
                       }}
                     >
                       {t("syncAllResults", "Get All Results")}
@@ -382,7 +391,7 @@ const ReferredOrdersList: React.FC = () => {
                     margin: "5px",
                   }}
                 >
-                  {isSyncing ? (
+                  {isSyncingAllTestOrders ? (
                     <InlineLoading
                       description={t("syncing", "Syncing...")}
                       status="active"
@@ -391,7 +400,7 @@ const ReferredOrdersList: React.FC = () => {
                     <Button
                       size="sm"
                       className={styles.button}
-                      onclick={handleSyncAllTestOrders}
+                      onClick={() => handleSyncAllTestOrders()}
                     >
                       {t("syncAll", "Sync All Orders")}
                     </Button>
