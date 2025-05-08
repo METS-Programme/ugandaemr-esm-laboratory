@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl, useConfig } from "@openmrs/esm-framework";
 import { useCallback } from "react";
 import useSWR, { mutate } from "swr";
+import { REFERINSTRUCTIONS } from "../constants";
 
 export interface Result {
   uuid: string;
@@ -129,10 +130,11 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
 export function useGetNewReferredOrders(dateTo?: string) {
   const customRepresentation =
     "v=custom:(order:(uuid,orderNumber,accessionNumber,instructions,careSetting:(uuid),encounter:(uuid,obs:(order:(uuid,display,patient:(uuid,display)))),fulfillerComment,orderType:(display),concept:(display,uuid),action,dateStopped,fulfillerStatus,dateActivated,orderer:(uuid,display),urgency,patient:(uuid,names:(display),display,gender,birthdate,identifiers:(voided,preferred,uuid,display,identifierType:(uuid)))),syncTask)";
-  let apiUrl = `${restBaseUrl}/syncreferralorder?${customRepresentation}`;
-  if (dateTo) {
-    apiUrl += `&activatedOnOrAfterDate=${dateTo}`;
-  }
+  const queryParams = new URLSearchParams();
+  queryParams.append("v", customRepresentation);
+  if (dateTo) queryParams.append("activatedOnOrAfterDate", dateTo);
+
+  const apiUrl = `${restBaseUrl}/syncreferralorder?${queryParams.toString()}`;
   const { data, error, isLoading } = useSWR<
     { data: { results: Array<any> } },
     Error
@@ -149,7 +151,7 @@ export function useGetNewReferredOrders(dateTo?: string) {
   );
 
   return {
-    data: data?.data ? data.data.results : [],
+    data: data?.data?.results ?? [],
     isLoading,
     isError: error,
     mutate: mutateReferredOrders,

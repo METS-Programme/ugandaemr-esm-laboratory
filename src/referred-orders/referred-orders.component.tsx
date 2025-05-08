@@ -45,6 +45,7 @@ import {
   syncSelectedTestOrderResults,
   syncSelectedTestOrders,
 } from "./referred-orders.resource";
+import { REFERINSTRUCTIONS } from "../constants";
 
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
@@ -64,7 +65,8 @@ const ReferredOrdersList: React.FC = () => {
 
   const { currentOrdersDate } = useOrderDate();
 
-  const { data: referredOrderList, isLoading } = useGetNewReferredOrders("");
+  const { data: referredOrderList, isLoading } =
+    useGetNewReferredOrders(currentOrdersDate);
 
   const pageSizes = [10, 20, 30, 40, 50];
 
