@@ -125,6 +125,7 @@ export function useGetOrdersWorklist(fulfillerStatus: string, dateTo?: string) {
   };
 }
 
+
 // get new refered orders
 export function useGetNewReferredOrders(dateTo?: string) {
   const customRepresentation =
@@ -156,22 +157,3 @@ export function useGetNewReferredOrders(dateTo?: string) {
   };
 }
 
-// request results
-
-export async function SyncTestOrder(orders: string[]) {
-  const apiUrl = `${restBaseUrl}/syncTestOrder`;
-
-  const payload = JSON.stringify({
-    orders: orders,
-  });
-
-  const abortController = new AbortController();
-  return await openmrsFetch(apiUrl, {
-    method: "POST",
-    signal: abortController.signal,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: payload,
-  });
-}
