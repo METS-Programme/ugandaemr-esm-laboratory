@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { Button, InlineLoading } from "@carbon/react";
 import { showSnackbar } from "@openmrs/esm-framework";
-import {
-  syncSelectedTestOrderResults,
-  syncSelectedTestOrders,
-} from "./referred-orders.resource";
+import { syncSelectedTestOrderResults } from "./referred-orders.resource";
 
 interface RequestResultsActionProps {
   orders: string[];
