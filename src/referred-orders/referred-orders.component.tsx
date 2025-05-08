@@ -31,6 +31,7 @@ import {
   TableExpandedRow,
   InlineLoading,
   TableToolbarSearch,
+  Toggle,
 } from "@carbon/react";
 import {
   extractErrorMessagesFromResponse,
@@ -45,10 +46,14 @@ import {
   syncSelectedTestOrderResults,
   syncSelectedTestOrders,
 } from "./referred-orders.resource";
-import { REFERINSTRUCTIONS } from "../constants";
 
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
+  const [isToggled, setIsToggled] = useState(false);
+
+  const handleToggleChange = () => {
+    setIsToggled(!isToggled);
+  };
 
   const [isSyncingAllTestOrders, setIsSyncingAllTestOrders] = useState(false);
 
@@ -65,8 +70,10 @@ const ReferredOrdersList: React.FC = () => {
 
   const { currentOrdersDate } = useOrderDate();
 
-  const { data: referredOrderList, isLoading } =
-    useGetNewReferredOrders(currentOrdersDate);
+  const { data: referredOrderList, isLoading } = useGetNewReferredOrders(
+    !isToggled ? "IN_PROGRESS" : "RECEIVED",
+    currentOrdersDate
+  );
 
   const pageSizes = [10, 20, 30, 40, 50];
 
@@ -312,27 +319,47 @@ const ReferredOrdersList: React.FC = () => {
           <TableContainer className={styles.tableContainer}>
             <TableToolbar style={{ position: "static" }}>
               <TableToolbarContent>
-                {/* selected implementation */}
                 <Layer
                   style={{
                     margin: "5px",
                   }}
                 >
-                  {isSyncingSelectedTestOrders ? (
-                    <InlineLoading
-                      description={t("syncing", "Syncing...")}
-                      status="active"
-                    />
-                  ) : (
-                    <Button
-                      size="sm"
-                      className={styles.button}
-                      onClick={() => handleSyncSelectedTestOrders(selectedRows)}
-                    >
-                      {t("syncSelected", "Sync Selected Orders")}
-                    </Button>
-                  )}
+                  <Toggle
+                    className={styles.toggle}
+                    labelA="Not Synced"
+                    labelB="Synced"
+                    id="sync-toggle"
+                    toggled={isToggled}
+                    onToggle={handleToggleChange}
+                  />
                 </Layer>
+
+                {/* selected implementation */}
+                {!isToggled && (
+                  <Layer
+                    style={{
+                      margin: "5px",
+                    }}
+                  >
+                    {isSyncingSelectedTestOrders ? (
+                      <InlineLoading
+                        description={t("syncing", "Syncing...")}
+                        status="active"
+                      />
+                    ) : (
+                      <Button
+                        size="sm"
+                        className={styles.button}
+                        onClick={() =>
+                          handleSyncSelectedTestOrders(selectedRows)
+                        }
+                      >
+                        {t("syncSelected", "Sync Selected Orders")}
+                      </Button>
+                    )}
+                  </Layer>
+                )}
+
                 <Layer
                   style={{
                     margin: "5px",
@@ -356,28 +383,32 @@ const ReferredOrdersList: React.FC = () => {
                   )}
                 </Layer>
                 {/* all implementation */}
-                <Layer
-                  style={{
-                    margin: "5px",
-                  }}
-                >
-                  {isSyncingAllTestOrderResults ? (
-                    <InlineLoading
-                      description={t("syncing", "Syncing...")}
-                      status="active"
-                    />
-                  ) : (
-                    <Button
-                      size="sm"
-                      className={styles.button}
-                      onClick={() => {
-                        handleSyncAllTestOrderResults();
-                      }}
-                    >
-                      {t("syncAllResults", "Get All Results")}
-                    </Button>
-                  )}
-                </Layer>
+
+                {isToggled && (
+                  <Layer
+                    style={{
+                      margin: "5px",
+                    }}
+                  >
+                    {isSyncingAllTestOrderResults ? (
+                      <InlineLoading
+                        description={t("syncing", "Syncing...")}
+                        status="active"
+                      />
+                    ) : (
+                      <Button
+                        size="sm"
+                        className={styles.button}
+                        onClick={() => {
+                          handleSyncAllTestOrderResults();
+                        }}
+                      >
+                        {t("syncAllResults", "Get All Results")}
+                      </Button>
+                    )}
+                  </Layer>
+                )}
+
                 <Layer
                   style={{
                     margin: "5px",
