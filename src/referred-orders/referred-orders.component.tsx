@@ -255,8 +255,7 @@ const ReferredOrdersList: React.FC = () => {
     { id: 5, header: t("test", "Test"), key: "test" },
     { id: 6, header: t("status", "Status"), key: "status" },
     { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
-    { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
-    { id: 9, header: t("action", "Actions"), key: "actions" },
+    { id: 8, header: t("message", "Message"), key: "message" },
   ];
   const tableRows = useMemo(() => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
@@ -287,15 +286,12 @@ const ReferredOrdersList: React.FC = () => {
           className={styles.statusContainer}
           style={{ color: `${getStatusColor(entry?.order?.fulfillerStatus)}` }}
         >
-          {entry?.fulfillerStatus}
+          {entry?.order?.fulfillerStatus}
         </span>
       ),
       orderer: entry?.order?.orderer?.display,
       orderType: entry?.order?.orderType?.display,
-      urgency: entry?.order?.urgency,
-      actions: (
-        <RequestResultsAction orders={paginatedReferredOrderEntries[index]} />
-      ),
+      message: paginatedReferredOrderEntries[index]?.syncTask.status,
     }));
   }, [paginatedReferredOrderEntries]);
 
@@ -474,7 +470,7 @@ const ReferredOrdersList: React.FC = () => {
                           {paginatedReferredOrderEntries[index]?.syncTask ===
                           null
                             ? "Not Synced"
-                            : "Synced"}
+                            : paginatedReferredOrderEntries[index]?.syncTask.status}
                         </div>
                       </TableExpandedRow>
                     )}
