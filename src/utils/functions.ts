@@ -4,7 +4,7 @@ import {
   restBaseUrl,
 } from "@openmrs/esm-framework";
 import dayjs from "dayjs";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { omrsDateFormat } from "../constants";
 import { useEffect, useState } from "react";
 
@@ -324,4 +324,10 @@ export const useOrderDate = () => {
   }, []);
 
   return { currentOrdersDate, setCurrentOrdersDate };
+};
+
+export const handleMutate = (url: string) => {
+  mutate((key) => typeof key === "string" && key.startsWith(url), undefined, {
+    revalidate: true,
+  });
 };

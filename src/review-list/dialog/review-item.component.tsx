@@ -15,9 +15,16 @@ import {
 } from "../../patient-chart/patient-laboratory-order-results.resource";
 import { useGetConceptById } from "../../patient-chart/results-summary/results-summary.resource";
 import { ApproverOrder } from "./review-item.resource";
-import { showNotification, showSnackbar } from "@openmrs/esm-framework";
+import {
+  restBaseUrl,
+  showNotification,
+  showSnackbar,
+} from "@openmrs/esm-framework";
 import { Result } from "../../work-list/work-list.resource";
-import { extractErrorMessagesFromResponse } from "../../utils/functions";
+import {
+  extractErrorMessagesFromResponse,
+  handleMutate,
+} from "../../utils/functions";
 
 interface ReviewItemDialogProps {
   encounterUuid: string;
@@ -74,6 +81,7 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
           ),
         });
         closeModal();
+        handleMutate(`${restBaseUrl}/order`);
       },
       (error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -84,6 +92,9 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
           critical: true,
           description: errorMessages.join(", "),
         });
+        closeModal();
+        handleMutate(`${restBaseUrl}/order`);
+     
       }
     );
   };

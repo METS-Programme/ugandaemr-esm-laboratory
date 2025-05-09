@@ -5,6 +5,7 @@ import {
   ConfigurableLink,
   formatDate,
   parseDate,
+  restBaseUrl,
   showSnackbar,
   usePagination,
 } from "@openmrs/esm-framework";
@@ -36,6 +37,7 @@ import {
 import {
   extractErrorMessagesFromResponse,
   getStatusColor,
+  handleMutate,
   useOrderDate,
 } from "../utils/functions";
 import styles from "./referred-orders.scss";
@@ -112,6 +114,8 @@ const ReferredOrdersList: React.FC = () => {
           subtitle: t("syncSuccess", "Test orders synced successfully."),
           kind: "success",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -122,6 +126,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .finally(() => {
         setIsSyncingSelectedTestOrders(false);
@@ -158,6 +164,8 @@ const ReferredOrdersList: React.FC = () => {
           ),
           kind: "success",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -168,6 +176,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .finally(() => {
         setIsSyncingSelectedTestOrderResults(false);
@@ -191,6 +201,8 @@ const ReferredOrdersList: React.FC = () => {
           subtitle: t("syncSuccess", "Test orders synced successfully."),
           kind: "success",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -201,6 +213,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .finally(() => {
         setIsSyncingAllTestOrders(false);
@@ -224,6 +238,8 @@ const ReferredOrdersList: React.FC = () => {
           subtitle: t("syncSuccess", "Test order results synced successfully."),
           kind: "success",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -234,6 +250,8 @@ const ReferredOrdersList: React.FC = () => {
             t("syncFailed", "An unexpected error occurred."),
           kind: "error",
         });
+        handleMutate(`${restBaseUrl}/referredorders`);
+
       })
       .finally(() => {
         setIsSyncingAllTestOrderResults(false);
@@ -291,7 +309,7 @@ const ReferredOrdersList: React.FC = () => {
       ),
       orderer: entry?.order?.orderer?.display,
       orderType: entry?.order?.orderType?.display,
-      message: paginatedReferredOrderEntries[index]?.syncTask.status,
+      message: paginatedReferredOrderEntries[index]?.syncTask?.status,
     }));
   }, [paginatedReferredOrderEntries]);
 
@@ -470,7 +488,8 @@ const ReferredOrdersList: React.FC = () => {
                           {paginatedReferredOrderEntries[index]?.syncTask ===
                           null
                             ? "Not Synced"
-                            : paginatedReferredOrderEntries[index]?.syncTask.status}
+                            : paginatedReferredOrderEntries[index]?.syncTask
+                                .status}
                         </div>
                       </TableExpandedRow>
                     )}
