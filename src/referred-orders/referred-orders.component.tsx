@@ -49,12 +49,15 @@ import {
   syncSelectedTestOrders,
 } from "./referred-orders.resource";
 
+type SyncView = "NOT_SYNCED" | "SYNCED";
+
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
-  const [isToggled, setIsToggled] = useState(false);
+
+  const [syncView, setSyncView] = useState<SyncView>("NOT_SYNCED");
 
   const handleToggleChange = () => {
-    setIsToggled(!isToggled);
+    setSyncView((prev) => (prev === "NOT_SYNCED" ? "SYNCED" : "NOT_SYNCED"));
   };
 
   const [isSyncingAllTestOrders, setIsSyncingAllTestOrders] = useState(false);
@@ -73,7 +76,7 @@ const ReferredOrdersList: React.FC = () => {
   const { currentOrdersDate } = useOrderDate();
 
   const { data: referredOrderList, isLoading } = useGetNewReferredOrders(
-    !isToggled ? "IN_PROGRESS" : "RECEIVED",
+    syncView === "NOT_SYNCED" ? "IN_PROGRESS" : "RECEIVED",
     currentOrdersDate
   );
 
@@ -115,7 +118,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "success",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -127,7 +129,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "error",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .finally(() => {
         setIsSyncingSelectedTestOrders(false);
@@ -165,7 +166,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "success",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -177,7 +177,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "error",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .finally(() => {
         setIsSyncingSelectedTestOrderResults(false);
@@ -202,7 +201,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "success",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -214,7 +212,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "error",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .finally(() => {
         setIsSyncingAllTestOrders(false);
@@ -239,7 +236,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "success",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .catch((error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -251,7 +247,6 @@ const ReferredOrdersList: React.FC = () => {
           kind: "error",
         });
         handleMutate(`${restBaseUrl}/referredorders`);
-
       })
       .finally(() => {
         setIsSyncingAllTestOrderResults(false);
@@ -343,13 +338,13 @@ const ReferredOrdersList: React.FC = () => {
                     labelA="Not Synced"
                     labelB="Synced"
                     id="sync-toggle"
-                    toggled={isToggled}
+                    toggled={syncView === "SYNCED"}
                     onToggle={handleToggleChange}
                   />
                 </Layer>
 
                 {/* selected implementation */}
-                {!isToggled && (
+                {syncView === "NOT_SYNCED" && (
                   <Layer
                     style={{
                       margin: "5px",
@@ -398,7 +393,7 @@ const ReferredOrdersList: React.FC = () => {
                 </Layer>
                 {/* all implementation */}
 
-                {isToggled && (
+                {syncView === "SYNCED" && (
                   <Layer
                     style={{
                       margin: "5px",

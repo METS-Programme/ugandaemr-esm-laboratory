@@ -94,7 +94,6 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
         });
         closeModal();
         handleMutate(`${restBaseUrl}/order`);
-     
       }
     );
   };
