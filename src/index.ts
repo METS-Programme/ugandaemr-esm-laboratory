@@ -2,7 +2,6 @@ import { defineConfigSchema, getSyncLifecycle } from "@openmrs/esm-framework";
 import { configSchema } from "./config-schema";
 import { createHomeDashboardLink } from "./components/create-dashboard-link.component";
 import rootComponent from "./root.component";
-import laboratoryReferralWorkspaceComponent from "./patient-chart/laboratory-workspaces/laboratory-referral.workspace.component";
 import laboratory from "./laboratory.component";
 import laboratoryOrder from "./patient-chart/patient-laboratory-order-results.component";
 import addToWorklist from "./tests-ordered/lab-dialogs/add-to-worklist-dialog.component";
@@ -21,10 +20,7 @@ import completedTile from "./lab-tiles/completed-tile.component";
 import testsOrdered from "./lab-tiles/tests-ordered-tile.component";
 import rejectedTile from "./lab-tiles/rejected-tile.component";
 
-import {
-  createDashboardLink,
-  registerWorkspace,
-} from "@openmrs/esm-patient-common-lib";
+import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import rejectedTabComponent from "./lab-tabs/rejected-tab.component";
 
 const moduleName = "@ugandaemr/esm-laboratory-app";
@@ -59,6 +55,7 @@ export const laboratoryOrderDashboardLink = getSyncLifecycle(
   createDashboardLink({
     path: "laboratory-orders",
     title: "Investigative Results",
+    icon: "",
     moduleName,
   }),
   options
@@ -126,9 +123,4 @@ export const rejectedTileComponent = getSyncLifecycle(rejectedTile, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-  registerWorkspace({
-    name: "patient-laboratory-referral-workspace",
-    title: "Laboratory Referral Form",
-    load: getSyncLifecycle(laboratoryReferralWorkspaceComponent, options),
-  });
 }
