@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePagination } from "@openmrs/esm-framework";
 import {
-  LaboratoryOrderFilter,
+  type LaboratoryOrderFilter,
   usePatientLaboratoryOrders,
 } from "./patient-laboratory-order-results.resource";
 

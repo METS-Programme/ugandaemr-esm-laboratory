@@ -1,7 +1,7 @@
-import React, { AnchorHTMLAttributes, useMemo } from "react";
+import React, { type AnchorHTMLAttributes, useMemo } from "react";
 import {
-  GroupMember,
-  Value,
+  type GroupMember,
+  type Value,
 } from "../patient-laboratory-order-results.resource";
 import { useTranslation } from "react-i18next";
 import {
@@ -38,7 +38,7 @@ const TestResultsChildren: React.FC<TestsResultsChildrenProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  let columns = [
+  const columns = [
     { id: 1, header: t("test", "Test"), key: "test" },
 
     {

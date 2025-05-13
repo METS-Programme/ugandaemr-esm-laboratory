@@ -1,7 +1,6 @@
 import { openmrsFetch, restBaseUrl, useConfig } from "@openmrs/esm-framework";
 import { useCallback } from "react";
 import useSWR, { mutate } from "swr";
-import { REFERINSTRUCTIONS } from "../constants";
 
 export interface Result {
   uuid: string;

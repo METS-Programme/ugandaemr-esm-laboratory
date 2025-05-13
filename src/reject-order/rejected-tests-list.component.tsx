@@ -18,7 +18,7 @@ import {
 } from "@carbon/react";
 
 import { useTranslation } from "react-i18next";
-import { formatDate, parseDate, usePagination } from "@openmrs/esm-framework";
+import { usePagination } from "@openmrs/esm-framework";
 import styles from "../tests-ordered/laboratory-queue.scss";
 import { useGetOrdersWorklist } from "../work-list/work-list.resource";
 import { useOrderDate } from "../utils/functions";
@@ -45,7 +45,7 @@ const RejectedTestsList: React.FC = () => {
     currentPage,
   } = usePagination(data, currentPageSize);
 
-  let columns = [
+  const columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
 
     { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
@@ -74,7 +74,7 @@ const RejectedTestsList: React.FC = () => {
       id: entry?.uuid,
       date: (
         <span className={styles["single-line-display"]}>
-          {formatDate(parseDate(entry?.dateActivated))}
+          {entry?.dateActivated}
         </span>
       ),
       patient: entry?.patient?.names[0]?.display,

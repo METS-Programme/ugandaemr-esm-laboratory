@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import styles from "./print-results-summary.scss";
-import { formatDate, parseDate } from "@openmrs/esm-framework";
 import logoImg from "../../../assets/logo/moh_logo_without_word.png";
-import { Identifier, PatientResource } from "../../utils/functions";
-import { useTranslation } from "react-i18next";
+import { type Identifier, type PatientResource } from "../../utils/functions";
 import PrintResultsTable from "./print-results-table.component";
-import { Result } from "../patient-laboratory-order-results.resource";
+import { type Result } from "../patient-laboratory-order-results.resource";
 
 interface PrintResultsSummaryProps {
   encounterResponse: Result;
@@ -21,7 +19,7 @@ const PrintResultsSummary: React.FC<PrintResultsSummaryProps> = ({
   );
 
   const results = useMemo(() => {
-    let groupedResults = [];
+    const groupedResults = [];
 
     filteredItems.forEach((element) => {
       groupedResults[element?.order?.display] = element;
@@ -95,14 +93,7 @@ const PrintResultsSummary: React.FC<PrintResultsSummaryProps> = ({
               : patient?.person?.gender === "F"
               ? " Female"
               : " Unknown"}
-            ,
-            <span>
-              {" "}
-              {formatDate(parseDate(patient?.person?.birthdate), {
-                mode: "standard",
-                time: false,
-              })}{" "}
-            </span>
+            ,<span>{patient?.person?.birthdate}</span>
           </span>
           <span style={{ margin: "5px", fontSize: "10px" }}>
             HIV Clinic No. :
@@ -133,10 +124,7 @@ const PrintResultsSummary: React.FC<PrintResultsSummaryProps> = ({
             Prepared By : {encounterResponse?.auditInfo?.creator?.display}
           </span>
           <span style={{ margin: "5px", fontSize: "10px" }}>
-            Date Requested :
-            {formatDate(parseDate(encounterResponse?.encounterDatetime), {
-              time: false,
-            })}
+            Date Requested :{encounterResponse?.encounterDatetime}
           </span>
         </div>
       </div>

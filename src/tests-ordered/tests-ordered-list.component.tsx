@@ -19,20 +19,13 @@ import {
 import { OverflowMenuVertical } from "@carbon/react/icons";
 
 import { useTranslation } from "react-i18next";
-import {
-  ExtensionSlot,
-  formatDate,
-  parseDate,
-  usePagination,
-} from "@openmrs/esm-framework";
+import { ExtensionSlot, usePagination } from "@openmrs/esm-framework";
 import styles from "./laboratory-queue.scss";
 import { useGetOrdersWorklist } from "../work-list/work-list.resource";
 import OrderCustomOverflowMenuComponent from "../ui-components/overflow-menu.component";
 import { useOrderDate } from "../utils/functions";
 
-interface LaboratoryPatientListProps {}
-
-const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
+const TestsOrderedList: React.FC = () => {
   const { t } = useTranslation();
 
   const { currentOrdersDate } = useOrderDate();
@@ -58,7 +51,7 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
     currentPage,
   } = usePagination(data, currentPageSize);
   // get picked orders
-  let columns = [
+  const columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
 
     { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
@@ -77,7 +70,7 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
         id: entry?.uuid,
         date: (
           <span className={styles["single-line-display"]}>
-            {formatDate(parseDate(entry?.dateActivated))}
+            {entry?.dateActivated}{" "}
           </span>
         ),
         patient: entry?.patient?.names[0]?.display,

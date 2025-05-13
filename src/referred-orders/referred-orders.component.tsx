@@ -254,7 +254,7 @@ const ReferredOrdersList: React.FC = () => {
   };
 
   // table columns
-  let columns = [
+  const columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
 
     { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },

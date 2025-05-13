@@ -16,7 +16,7 @@ import {
 } from "@carbon/react";
 import styles from "./results-summary.scss";
 import TestResultsChildren from "./test-children-results.component";
-import { Ob } from "../patient-laboratory-order-results.resource";
+import { type Ob } from "../patient-laboratory-order-results.resource";
 
 interface TestOrdersProps {
   obs: Ob[];
@@ -25,7 +25,7 @@ interface TestOrdersProps {
 const TestsPrintResults: React.FC<TestOrdersProps> = ({ obs }) => {
   const { t } = useTranslation();
 
-  let columns = [
+  const columns = [
     { id: 1, header: t("order", "Order"), key: "order" },
     { id: 2, header: t("results", "Results"), key: "result" },
   ];

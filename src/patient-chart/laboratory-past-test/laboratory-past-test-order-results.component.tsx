@@ -56,7 +56,7 @@ import PrintResultsSummary from "../results-summary/print-results-summary.compon
 import { OrderTagStyle, useGetPatientByUuid } from "../../utils/functions";
 import {
   ResourceRepresentation,
-  Result,
+  type Result,
 } from "../patient-laboratory-order-results.resource";
 import { useLaboratoryOrderResultsPages } from "../patient-laboratory-order-results-table.resource";
 import { CardHeader } from "@openmrs/esm-patient-common-lib";

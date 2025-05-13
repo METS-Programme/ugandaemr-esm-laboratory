@@ -1,4 +1,4 @@
-import { Concept } from "../work-list/work-list.resource";
+import { type Concept } from "../work-list/work-list.resource";
 
 export interface PatientQueue {
   uuid: string;

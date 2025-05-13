@@ -1,12 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Result, useGetOrdersWorklist } from "../work-list/work-list.resource";
 import {
-  formatDate,
-  parseDate,
-  showModal,
-  usePagination,
-} from "@openmrs/esm-framework";
+  type Result,
+  useGetOrdersWorklist,
+} from "../work-list/work-list.resource";
+import { showModal, usePagination } from "@openmrs/esm-framework";
 import {
   DataTable,
   DataTableSkeleton,
@@ -92,7 +90,7 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
   } = usePagination(filtered, currentPageSize);
 
   // get picked orders
-  let columns = [
+  const columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
 
     { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
@@ -114,7 +112,7 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
     return paginatedReviewOrderEntries.map((entry) => ({
       ...entry,
       id: entry?.uuid,
-      date: formatDate(parseDate(entry?.dateActivated)),
+      date: entry?.dateActivated,
       patient: entry?.patient?.names[0]?.display,
       orderNumber: entry?.orderNumber,
       artNumber: entry.patient?.identifiers

@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@carbon/react";
 import { ErrorState } from "@openmrs/esm-framework";
-import { Encounter } from "../../types/patient-queues";
+import { type Encounter } from "../../types/patient-queues";
 import styles from "../laboratory-queue.scss";
 import PickLabRequestActionMenu from "../pick-lab-request-menu.component";
 
@@ -23,7 +23,7 @@ interface LabTestsProps {
 
 const LabTests: React.FC<LabTestsProps> = ({ encounter, queueId }) => {
   const { t } = useTranslation();
-  let columns = [
+  const columns = [
     { id: 1, header: t("order", "Order"), key: "order", align: "left" },
     {
       id: 2,

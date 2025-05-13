@@ -13,7 +13,7 @@ import {
   useGetOrderConceptByUuid,
   UpdateOrderResult,
 } from "./result-form.resource";
-import { Result } from "../work-list/work-list.resource";
+import { type Result } from "../work-list/work-list.resource";
 import ResultFormField from "./result-form-field.component";
 import { useForm } from "react-hook-form";
 
@@ -57,10 +57,10 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
     e.preventDefault();
     // assign result to test order
     const documentedValues = getValues();
-    let obsValue = [];
+    const obsValue = [];
 
     if (concept.set && concept.setMembers.length > 0) {
-      let groupMembers = [];
+      const groupMembers = [];
       concept.setMembers.forEach((member) => {
         let value;
         if (

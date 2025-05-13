@@ -26,7 +26,7 @@ import {
   useReferralLocations,
   useSpecimenTypes,
 } from "./add-to-worklist-dialog.resource";
-import { Order } from "../../types/patient-queues";
+import { type Order } from "../../types/patient-queues";
 import {
   extractErrorMessagesFromResponse,
   handleMutate,

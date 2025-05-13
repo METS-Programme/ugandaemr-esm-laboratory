@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DataTable,
@@ -16,8 +16,7 @@ import {
 } from "@carbon/react";
 import styles from "./results-summary.scss";
 import TestResultsChildren from "./test-children-results.component";
-import { formatDate, parseDate } from "@openmrs/esm-framework";
-import { Ob } from "../patient-laboratory-order-results.resource";
+import { type Ob } from "../patient-laboratory-order-results.resource";
 
 interface TestOrdersProps {
   obs: Ob[];
@@ -32,9 +31,6 @@ const TestsResults: React.FC<TestOrdersProps> = ({ obs }) => {
     { id: 2, header: t("result", "Results"), key: "result" },
   ];
 
-  const formatDateColumn = (obsDatetime) =>
-    formatDate(parseDate(obsDatetime), { time: false });
-
   const obsList = obs?.filter((ob) => ob?.order?.type === "testorder");
 
   const obsRows = useMemo(
@@ -42,7 +38,7 @@ const TestsResults: React.FC<TestOrdersProps> = ({ obs }) => {
       obsList.map((ob, index) => ({
         id: ob.uuid,
         order: { content: <span>{ob?.concept?.display}</span> },
-        date: { content: <span>{formatDateColumn(ob?.obsDatetime)}</span> },
+        date: { content: <span>{ob?.obsDatetime}</span> },
         result: {
           content: (
             <span>

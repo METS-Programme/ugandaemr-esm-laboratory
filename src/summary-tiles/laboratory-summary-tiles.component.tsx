@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./laboratory-summary-tiles.scss";
 import {
-  AssignedExtension,
+  type AssignedExtension,
   useConnectedExtensions,
   Extension,
 } from "@openmrs/esm-framework";

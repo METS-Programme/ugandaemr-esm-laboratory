@@ -1,13 +1,13 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 import {
-  FetchResponse,
+  type FetchResponse,
   openmrsFetch,
   restBaseUrl,
   useConfig,
 } from "@openmrs/esm-framework";
 
-import { Result } from "../work-list/work-list.resource";
+import { type Result } from "../work-list/work-list.resource";
 
 export function useMetrics() {
   const metrics = {
@@ -16,7 +16,7 @@ export function useMetrics() {
     transferred: 1,
     completed: 6,
   };
-  const { data, error } = useSWR<{ data: { results: {} } }, Error>(
+  const { data, error } = useSWR<{ data: { results: any } }, Error>(
     `${restBaseUrl}/queue?`,
     openmrsFetch
   );

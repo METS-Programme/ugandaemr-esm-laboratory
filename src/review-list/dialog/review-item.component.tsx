@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import styles from "../dialog/review-item.scss";
 import {
-  GroupMember,
+  type GroupMember,
   useGetEncounterById,
 } from "../../patient-chart/patient-laboratory-order-results.resource";
 import { useGetConceptById } from "../../patient-chart/results-summary/results-summary.resource";
@@ -20,7 +20,7 @@ import {
   showNotification,
   showSnackbar,
 } from "@openmrs/esm-framework";
-import { Result } from "../../work-list/work-list.resource";
+import { type Result } from "../../work-list/work-list.resource";
 import {
   extractErrorMessagesFromResponse,
   handleMutate,
@@ -56,7 +56,7 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
   }, [encounter?.obs, orderItem]);
 
   const filteredGroupedResults = useMemo(() => {
-    let groupedResults = [];
+    const groupedResults = [];
 
     testsOrder?.forEach((element) => {
       groupedResults[element?.concept?.display] = element;

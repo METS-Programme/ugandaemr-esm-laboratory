@@ -20,12 +20,10 @@ import {
   Button,
   Tile,
 } from "@carbon/react";
-import { Result, useGetOrdersWorklist } from "./work-list.resource";
+import { type Result, useGetOrdersWorklist } from "./work-list.resource";
 import styles from "./work-list.scss";
 import {
   ConfigurableLink,
-  formatDate,
-  parseDate,
   showModal,
   usePagination,
 } from "@openmrs/esm-framework";
@@ -91,7 +89,7 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
   };
 
   // get picked orders
-  let columns = [
+  const columns = [
     { id: 0, header: t("date", "Date"), key: "date" },
 
     { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
@@ -131,7 +129,7 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
     return paginatedWorkListEntries.map((entry, index) => ({
       ...entry,
       id: entry?.uuid,
-      date: formatDate(parseDate(entry?.dateActivated)),
+      date: entry?.dateActivated,
       patient: (
         <ConfigurableLink
           to={`\${openmrsSpaBase}/patient/${entry?.patient?.uuid}/chart/laboratory-orders`}

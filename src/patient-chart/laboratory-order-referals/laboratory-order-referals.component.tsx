@@ -53,7 +53,7 @@ import PrintResultsSummary from "../results-summary/print-results-summary.compon
 import { OrderTagStyle, useGetPatientByUuid } from "../../utils/functions";
 import {
   ResourceRepresentation,
-  Result,
+  type Result,
 } from "../patient-laboratory-order-results.resource";
 import { useLaboratoryOrderResultsPages } from "../patient-laboratory-order-results-table.resource";
 import {
@@ -81,12 +81,8 @@ const LaboratoryOrderReferalResults: React.FC<
 > = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const {
-    enableSendingLabTestsByEmail,
-    laboratoryEncounterTypeUuid,
-    artCardEncounterTypeUuid,
-    laboratoryOrderTypeUuid,
-  } = useConfig();
+  const { enableSendingLabTestsByEmail, laboratoryEncounterTypeUuid } =
+    useConfig();
 
   const displayText = t(
     "referralLaboratoryTestsDisplayTextTitle",

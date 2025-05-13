@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
-import { OverflowMenuItem, OverflowMenu } from "@carbon/react";
+import { OverflowMenuItem } from "@carbon/react";
 import { useTranslation } from "react-i18next";
 import { showModal } from "@openmrs/esm-framework";
-import { Result } from "../work-list/work-list.resource";
+import { type Result } from "../work-list/work-list.resource";
 
 interface RejectOrderOverflowMenuItemProps {
   order: Result;
