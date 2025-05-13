@@ -274,7 +274,10 @@ const ReferredOrdersList: React.FC = () => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
       ...entry,
       id: entry?.order?.uuid,
-      date: formatDate(parseDate(entry?.order?.dateActivated)),
+      date: formatDate(parseDate(entry?.order?.dateActivated), {
+        mode: "standard",
+        time: true,
+      }),
       patient: (
         <ConfigurableLink
           to={`\${openmrsSpaBase}/patient/${entry?.order?.patient?.uuid}/chart/laboratory-orders`}

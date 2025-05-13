@@ -1,7 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGetOrdersWorklist } from "../work-list/work-list.resource";
-import { usePagination, ConfigurableLink } from "@openmrs/esm-framework";
+import {
+  usePagination,
+  ConfigurableLink,
+  formatDate,
+  parseDate,
+} from "@openmrs/esm-framework";
 import {
   DataTable,
   Pagination,
@@ -72,7 +77,10 @@ const CompletedList: React.FC<CompletedListProps> = ({ fulfillerStatus }) => {
       .map((entry) => ({
         ...entry,
         id: entry?.uuid,
-        date: entry?.dateActivated,
+        date: formatDate(parseDate(entry.dateActivated), {
+          mode: "standard",
+          time: true,
+        }),
 
         patient: (
           <ConfigurableLink
