@@ -27,7 +27,10 @@ import {
   useSpecimenTypes,
 } from "./add-to-worklist-dialog.resource";
 import { Order } from "../../types/patient-queues";
-import { extractErrorMessagesFromResponse, handleMutate } from "../../utils/functions";
+import {
+  extractErrorMessagesFromResponse,
+  handleMutate,
+} from "../../utils/functions";
 
 interface AddToWorklistDialogProps {
   queueId;
@@ -86,7 +89,6 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
         });
         closeModal();
         handleMutate(`${restBaseUrl}/order`);
-
       },
       (error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -98,7 +100,6 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
           description: errorMessages.join(", "),
         });
         handleMutate(`${restBaseUrl}/order`);
-
       }
     );
   };
