@@ -12,8 +12,8 @@ import { useTranslation } from "react-i18next";
 import styles from "./reject-order-dialog.scss";
 import { Result } from "../work-list/work-list.resource";
 import { RejectOrder } from "./reject-order-dialog.resource";
-import { showNotification, showSnackbar } from "@openmrs/esm-framework";
-import { extractErrorMessagesFromResponse } from "../utils/functions";
+import { restBaseUrl, showNotification, showSnackbar } from "@openmrs/esm-framework";
+import { extractErrorMessagesFromResponse, handleMutate } from "../utils/functions";
 
 interface RejectOrderDialogProps {
   order: Result;
@@ -47,6 +47,7 @@ const RejectOrderDialog: React.FC<RejectOrderDialogProps> = ({
           ),
         });
         closeModal();
+        handleMutate(`${restBaseUrl}/order`);
       },
       (error) => {
         const errorMessages = extractErrorMessagesFromResponse(error);
@@ -57,6 +58,8 @@ const RejectOrderDialog: React.FC<RejectOrderDialogProps> = ({
           critical: true,
           description: errorMessages.join(", "),
         });
+        handleMutate(`${restBaseUrl}/order`);
+
       }
     );
   };
