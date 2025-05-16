@@ -44,7 +44,6 @@ import {
 import {
   Printer,
   MailAll,
-  Add,
   Checkmark,
   SendAlt,
   NotSent,

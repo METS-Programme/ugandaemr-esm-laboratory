@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import styles from "./print-results-summary.scss";
 import { formatDate, parseDate } from "@openmrs/esm-framework";
 import logoImg from "../../../assets/logo/moh_logo_without_word.png";

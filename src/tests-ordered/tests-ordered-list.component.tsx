@@ -28,7 +28,7 @@ import {
 import styles from "./laboratory-queue.scss";
 import { useGetOrdersWorklist } from "../work-list/work-list.resource";
 import OrderCustomOverflowMenuComponent from "../ui-components/overflow-menu.component";
-import { useOrderDate } from "../utils/functions";
+import { formatWaitTime, useOrderDate } from "../utils/functions";
 
 interface LaboratoryPatientListProps {}
 
@@ -67,7 +67,8 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
     { id: 4, header: t("test", "Test"), key: "test" },
     { id: 5, header: t("orderer", "Ordered By"), key: "orderer" },
     { id: 6, header: t("urgency", "Urgency"), key: "urgency" },
-    { id: 7, header: t("actions", "Actions"), key: "actions" },
+    { id: 7, header: t("waitTime", "Wait Time"), key: "waitTime" },
+    { id: 8, header: t("actions", "Actions"), key: "actions" },
   ];
 
   const tableRows = useMemo(() => {
@@ -94,6 +95,11 @@ const TestsOrderedList: React.FC<LaboratoryPatientListProps> = () => {
         action: entry?.action,
         orderer: entry?.orderer?.display,
         urgency: entry?.urgency,
+        waitTime: (
+          <span className={styles["single-line-display"]}>
+            {formatWaitTime(entry?.dateActivated, t)}
+          </span>
+        ),
         actions: (
           <OrderCustomOverflowMenuComponent
             menuTitle={

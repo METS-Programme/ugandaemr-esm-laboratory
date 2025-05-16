@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import useSWRImmutable from "swr/immutable";
 import {
   FetchResponse,
