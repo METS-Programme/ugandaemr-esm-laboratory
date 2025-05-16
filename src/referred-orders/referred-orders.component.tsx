@@ -371,28 +371,30 @@ const ReferredOrdersList: React.FC = () => {
                   </Layer>
                 )}
 
-                <Layer
-                  style={{
-                    margin: "5px",
-                  }}
-                >
-                  {isSyncingSelectedTestOrderResults ? (
-                    <InlineLoading
-                      description={t("syncing", "Syncing...")}
-                      status="active"
-                    />
-                  ) : (
-                    <Button
-                      size="sm"
-                      className={styles.button}
-                      onClick={() =>
-                        handleSyncSelectedTestOrderResults(selectedRows)
-                      }
-                    >
-                      {t("resultsForSelected", "Get Results For Selected")}
-                    </Button>
-                  )}
-                </Layer>
+                {syncView === "SYNCED" && (
+                  <Layer
+                    style={{
+                      margin: "5px",
+                    }}
+                  >
+                    {isSyncingSelectedTestOrderResults ? (
+                      <InlineLoading
+                        description={t("syncing", "Syncing...")}
+                        status="active"
+                      />
+                    ) : (
+                      <Button
+                        size="sm"
+                        className={styles.button}
+                        onClick={() =>
+                          handleSyncSelectedTestOrderResults(selectedRows)
+                        }
+                      >
+                        {t("resultsForSelected", "Get Results For Selected")}
+                      </Button>
+                    )}
+                  </Layer>
+                )}
                 {/* all implementation */}
 
                 {syncView === "SYNCED" && (
@@ -420,26 +422,28 @@ const ReferredOrdersList: React.FC = () => {
                   </Layer>
                 )}
 
-                <Layer
-                  style={{
-                    margin: "5px",
-                  }}
-                >
-                  {isSyncingAllTestOrders ? (
-                    <InlineLoading
-                      description={t("syncing", "Syncing...")}
-                      status="active"
-                    />
-                  ) : (
-                    <Button
-                      size="sm"
-                      className={styles.button}
-                      onClick={() => handleSyncAllTestOrders()}
-                    >
-                      {t("syncAll", "Sync All Orders")}
-                    </Button>
-                  )}
-                </Layer>
+                {syncView === "NOT_SYNCED" && (
+                  <Layer
+                    style={{
+                      margin: "5px",
+                    }}
+                  >
+                    {isSyncingAllTestOrders ? (
+                      <InlineLoading
+                        description={t("syncing", "Syncing...")}
+                        status="active"
+                      />
+                    ) : (
+                      <Button
+                        size="sm"
+                        className={styles.button}
+                        onClick={() => handleSyncAllTestOrders()}
+                      >
+                        {t("syncAll", "Sync All Orders")}
+                      </Button>
+                    )}
+                  </Layer>
+                )}
 
                 <Layer style={{ margin: "5px" }}>
                   <TableToolbarSearch
