@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
 import {
   DataTable,
   DataTableSkeleton,
@@ -15,56 +15,47 @@ import {
   Layer,
   Tile,
   TableToolbarSearch,
-} from "@carbon/react";
+} from '@carbon/react';
 
-import { useTranslation } from "react-i18next";
-import { formatDate, parseDate, usePagination } from "@openmrs/esm-framework";
-import styles from "../tests-ordered/laboratory-queue.scss";
-import { useGetOrdersWorklist } from "../work-list/work-list.resource";
-import { useOrderDate } from "../utils/functions";
+import { useTranslation } from 'react-i18next';
+import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import styles from '../tests-ordered/laboratory-queue.scss';
+import { useGetOrdersWorklist } from '../work-list/work-list.resource';
+import { useOrderDate } from '../utils/functions';
 
 const RejectedTestsList: React.FC = () => {
   const { t } = useTranslation();
 
   const { currentOrdersDate } = useOrderDate();
-  const { data: pickedOrderList, isLoading } = useGetOrdersWorklist(
-    "",
-    currentOrdersDate
-  );
+  const { data: pickedOrderList, isLoading } = useGetOrdersWorklist('', currentOrdersDate);
 
-  const data = pickedOrderList.filter(
-    (item) => item?.fulfillerStatus === "DECLINED"
-  );
+  const data = pickedOrderList.filter((item) => item?.fulfillerStatus === 'DECLINED');
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
 
-  const {
-    goTo,
-    results: paginatedPickedOrderQueueEntries,
-    currentPage,
-  } = usePagination(data, currentPageSize);
+  const { goTo, results: paginatedPickedOrderQueueEntries, currentPage } = usePagination(data, currentPageSize);
 
   let columns = [
-    { id: 0, header: t("date", "Date"), key: "date" },
+    { id: 0, header: t('date', 'Date'), key: 'date' },
 
-    { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
-    { id: 2, header: t("artNumber", "Art Number"), key: "artNumber" },
+    { id: 1, header: t('orderNumber', 'Order Number'), key: 'orderNumber' },
+    { id: 2, header: t('artNumber', 'Art Number'), key: 'artNumber' },
 
     {
       id: 3,
-      header: t("accessionNumber", "Accession Number"),
-      key: "accessionNumber",
+      header: t('accessionNumber', 'Accession Number'),
+      key: 'accessionNumber',
     },
-    { id: 4, header: t("patient", "Patient"), key: "patient" },
+    { id: 4, header: t('patient', 'Patient'), key: 'patient' },
 
-    { id: 5, header: t("test", "Test"), key: "test" },
-    { id: 6, header: t("orderer", "Ordered By"), key: "orderer" },
-    { id: 7, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 5, header: t('test', 'Test'), key: 'test' },
+    { id: 6, header: t('orderer', 'Ordered By'), key: 'orderer' },
+    { id: 7, header: t('urgency', 'Urgency'), key: 'urgency' },
     {
       id: 8,
-      header: t("fulfillerComment", "Reason for Rejection"),
-      key: "fulfillerComment",
+      header: t('fulfillerComment', 'Reason for Rejection'),
+      key: 'fulfillerComment',
     },
   ];
 
@@ -72,19 +63,11 @@ const RejectedTestsList: React.FC = () => {
     return paginatedPickedOrderQueueEntries.map((entry) => ({
       ...entry,
       id: entry?.uuid,
-      date: (
-        <span className={styles["single-line-display"]}>
-          {formatDate(parseDate(entry?.dateActivated))}
-        </span>
-      ),
+      date: <span className={styles['single-line-display']}>{formatDate(parseDate(entry?.dateActivated))}</span>,
       patient: entry?.patient?.names[0]?.display,
       artNumber: entry.patient?.identifiers
-        .find(
-          (item) =>
-            item?.identifierType?.uuid ===
-            "e1731641-30ab-102d-86b0-7a5022ba4115"
-        )
-        ?.display.split("=")[1]
+        .find((item) => item?.identifierType?.uuid === 'e1731641-30ab-102d-86b0-7a5022ba4115')
+        ?.display.split('=')[1]
         .trim(),
       orderNumber: entry?.orderNumber,
       accessionNumber: entry?.accessionNumber,
@@ -102,32 +85,19 @@ const RejectedTestsList: React.FC = () => {
 
   if (paginatedPickedOrderQueueEntries?.length >= 0) {
     return (
-      <DataTable
-        rows={tableRows}
-        headers={columns}
-        useZebraStyles
-        overflowMenuOnHover={true}
-      >
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getTableProps,
-          getRowProps,
-          onInputChange,
-        }) => (
+      <DataTable rows={tableRows} headers={columns} useZebraStyles overflowMenuOnHover={true}>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
             <TableToolbar
               style={{
-                position: "static",
-              }}
-            >
+                position: 'static',
+              }}>
               <TableToolbarContent>
-                <Layer style={{ margin: "5px" }}>
+                <Layer style={{ margin: '5px' }}>
                   <TableToolbarSearch
                     expanded
                     onChange={onInputChange}
-                    placeholder={t("searchThisList", "Search this list")}
+                    placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
                   />
                 </Layer>
@@ -137,9 +107,7 @@ const RejectedTestsList: React.FC = () => {
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
+                    <TableHeader {...getHeaderProps({ header })}>{header.header?.content ?? header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
@@ -149,9 +117,7 @@ const RejectedTestsList: React.FC = () => {
                     <React.Fragment key={row.id}>
                       <TableRow {...getRowProps({ row })} key={row.id}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
-                            {cell.value?.content ?? cell.value}
-                          </TableCell>
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                       </TableRow>
                     </React.Fragment>
@@ -163,12 +129,7 @@ const RejectedTestsList: React.FC = () => {
               <div className={styles.tileContainer}>
                 <Tile className={styles.tile}>
                   <div className={styles.tileContent}>
-                    <p className={styles.content}>
-                      {t(
-                        "noRejectedTestsToDisplay",
-                        "No rejected tests to display"
-                      )}
-                    </p>
+                    <p className={styles.content}>{t('noRejectedTestsToDisplay', 'No rejected tests to display')}</p>
                   </div>
                 </Tile>
               </div>

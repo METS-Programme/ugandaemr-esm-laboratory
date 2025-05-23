@@ -1,5 +1,5 @@
-import { openmrsFetch, restBaseUrl } from "@openmrs/esm-framework";
-import useSWR from "swr";
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 
 export interface ConceptResponse {
   uuid: string;
@@ -307,7 +307,7 @@ export async function GetOrderConceptByUuid(uuid: string) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/concept/${uuid}?v=full`, {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     signal: abortController.signal,
   });
@@ -316,10 +316,10 @@ export async function GetOrderConceptByUuid(uuid: string) {
 export function useGetOrderConceptByUuid(uuid: string) {
   const apiUrl = `${restBaseUrl}/concept/${uuid}?v=custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<
-    { data: ConceptResponse },
-    Error
-  >(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: ConceptResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
   return {
     concept: data?.data,
     isLoading,
@@ -332,9 +332,9 @@ export function useGetOrderConceptByUuid(uuid: string) {
 export async function UpdateEncounter(uuid: string, payload: any) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/encounter/${uuid}`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     signal: abortController.signal,
     body: payload,
@@ -342,16 +342,12 @@ export async function UpdateEncounter(uuid: string, payload: any) {
 }
 
 //TODO: the calls to update order and observations for results should be transactional to allow for rollback
-export async function UpdateOrderResult(
-  encounterUuid: string,
-  obsPayload: any,
-  orderPayload: any
-) {
+export async function UpdateOrderResult(encounterUuid: string, obsPayload: any, orderPayload: any) {
   const abortController = new AbortController();
   const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     signal: abortController.signal,
     body: orderPayload,
@@ -359,9 +355,9 @@ export async function UpdateOrderResult(
 
   if (updateOrderCall.status === 201) {
     return await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       signal: abortController.signal,
       body: obsPayload,

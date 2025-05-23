@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Form,
@@ -9,28 +9,20 @@ import {
   SelectItem,
   Checkbox,
   TextInput,
-} from "@carbon/react";
-import { useTranslation } from "react-i18next";
-import styles from "./add-to-worklist-dialog.scss";
-import {
-  restBaseUrl,
-  showNotification,
-  showSnackbar,
-  useConfig,
-} from "@openmrs/esm-framework";
-import { Renew } from "@carbon/react/icons";
+} from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import styles from './add-to-worklist-dialog.scss';
+import { restBaseUrl, showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { Renew } from '@carbon/react/icons';
 import {
   GenerateSpecimenId,
   UpdateOrder,
   extractLetters,
   useReferralLocations,
   useSpecimenTypes,
-} from "./add-to-worklist-dialog.resource";
-import { Order } from "../../types/patient-queues";
-import {
-  extractErrorMessagesFromResponse,
-  handleMutate,
-} from "../../utils/functions";
+} from './add-to-worklist-dialog.resource';
+import { Order } from '../../types/patient-queues';
+import { extractErrorMessagesFromResponse, handleMutate } from '../../utils/functions';
 
 interface AddToWorklistDialogProps {
   queueId;
@@ -38,16 +30,12 @@ interface AddToWorklistDialogProps {
   closeModal: () => void;
 }
 
-const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
-  queueId,
-  order,
-  closeModal,
-}) => {
+const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, order, closeModal }) => {
   const { t } = useTranslation();
 
   const [preferred, setPreferred] = useState(false);
 
-  const [specimenID, setSpecimenID] = useState("");
+  const [specimenID, setSpecimenID] = useState('');
 
   const { specimenTypes } = useSpecimenTypes();
 
@@ -55,13 +43,13 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
 
   const [specimenType, setSpecimenType] = useState();
 
-  const [selectedReferral, setSelectedReferral] = useState("");
+  const [selectedReferral, setSelectedReferral] = useState('');
 
-  const [barcode, setBarcode] = useState("");
+  const [barcode, setBarcode] = useState('');
 
-  const [confirmBarcode, setConfirmBarcode] = useState("");
+  const [confirmBarcode, setConfirmBarcode] = useState('');
 
-  const [externalReferralName, setExternalReferralName] = useState("");
+  const [externalReferralName, setExternalReferralName] = useState('');
 
   const config = useConfig();
 
@@ -71,21 +59,18 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
     let body = {
       sampleId: specimenID,
       specimenSourceId: specimenType,
-      unProcessedOrders: "",
+      unProcessedOrders: '',
       patientQueueId: queueId,
-      referenceLab: preferred ? extractLetters(selectedReferral) : "",
+      referenceLab: preferred ? extractLetters(selectedReferral) : '',
     };
 
     UpdateOrder(order.uuid, body).then(
       () => {
         showSnackbar({
           isLowContrast: true,
-          title: t("pickedAnOrder", "Picked an order"),
-          kind: "success",
-          subtitle: t(
-            "pickSuccessfully",
-            "You have successfully picked an Order"
-          ),
+          title: t('pickedAnOrder', 'Picked an order'),
+          kind: 'success',
+          subtitle: t('pickSuccessfully', 'You have successfully picked an Order'),
         });
         closeModal();
         handleMutate(`${restBaseUrl}/order`);
@@ -95,12 +80,12 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
 
         showNotification({
           title: t(`errorPicking an order', 'Error Picking an Order`),
-          kind: "error",
+          kind: 'error',
           critical: true,
-          description: errorMessages.join(", "),
+          description: errorMessages.join(', '),
         });
         handleMutate(`${restBaseUrl}/order`);
-      }
+      },
     );
   };
 
@@ -116,12 +101,9 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
         setSpecimenID(resp.data.results[0].sampleId);
         showSnackbar({
           isLowContrast: true,
-          title: t("generatesampleID", "Generate Sample Id"),
-          kind: "success",
-          subtitle: t(
-            "generateSuccessfully",
-            "You have successfully generated a Sample Id"
-          ),
+          title: t('generatesampleID', 'Generate Sample Id'),
+          kind: 'success',
+          subtitle: t('generateSuccessfully', 'You have successfully generated a Sample Id'),
         });
       },
       (error) => {
@@ -129,16 +111,16 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
 
         showNotification({
           title: t(`errorGeneratingId', 'Error Generating Sample Id`),
-          kind: "error",
+          kind: 'error',
           critical: true,
-          description: errorMessages.join(", "),
+          description: errorMessages.join(', '),
         });
-      }
+      },
     );
   };
 
   useEffect(() => {
-    if (barcode !== "" && confirmBarcode !== "" && barcode == confirmBarcode) {
+    if (barcode !== '' && confirmBarcode !== '' && barcode == confirmBarcode) {
       setSpecimenID(barcode);
     }
   }, [barcode, confirmBarcode]);
@@ -146,51 +128,42 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
   return (
     <div>
       <Form onSubmit={pickLabRequestQueue}>
-        <ModalHeader
-          closeModal={closeModal}
-          title={t("pickRequest", `Test : ${order?.concept?.display}`)}
-        />
+        <ModalHeader closeModal={closeModal} title={t('pickRequest', `Test : ${order?.concept?.display}`)} />
         <ModalBody>
           <div className={styles.modalBody}>
             <section className={styles.section}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  alignContent: "stretch",
-                }}
-              >
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  alignContent: 'stretch',
+                }}>
                 <div className={styles.sectionTitle}>
-                  {preferred
-                    ? t("barcode", "Barcode")
-                    : t("specimenID", "Specimen ID")}
+                  {preferred ? t('barcode', 'Barcode') : t('specimenID', 'Specimen ID')}
                 </div>
 
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    columnGap: "10px",
-                  }}
-                >
-                  <div style={{ width: "430px" }}>
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    columnGap: '10px',
+                  }}>
+                  <div style={{ width: '430px' }}>
                     <TextInput
                       type="text"
                       id="specimentId"
                       value={specimenID}
                       readOnly={
-                        config.enableSpecimenIdAutoGeneration
-                          ? config.enableSpecimenIdAutoGeneration
-                          : preferred
+                        config.enableSpecimenIdAutoGeneration ? config.enableSpecimenIdAutoGeneration : preferred
                       }
                       hideReadOnly={preferred}
                       onChange={(e) => setSpecimenID(e.target.value)}
                     />
                   </div>
 
-                  <div style={{ width: "50px" }}>
+                  <div style={{ width: '50px' }}>
                     {config.enableSpecimenIdAutoGeneration && (
                       <Button
                         hasIconOnly
@@ -206,36 +179,23 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
             <section className={styles.section}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  alignContent: "stretch",
-                }}
-              >
-                <div className={styles.sectionTitle}>
-                  {t("specimenType", "Specimen Type")}
-                </div>
-                <div style={{ width: "500px" }}>
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  alignContent: 'stretch',
+                }}>
+                <div className={styles.sectionTitle}>{t('specimenType', 'Specimen Type')}</div>
+                <div style={{ width: '500px' }}>
                   <section className={styles.section}>
                     <Select
                       labelText=""
                       id="speciment-types"
                       name="specimen-types"
                       value={specimenType}
-                      onChange={(event) => setSpecimenType(event.target.value)}
-                    >
-                      {!specimenType ? (
-                        <SelectItem
-                          text={t("specimenType", "Select Specimen Type")}
-                          value=""
-                        />
-                      ) : null}
+                      onChange={(event) => setSpecimenType(event.target.value)}>
+                      {!specimenType ? <SelectItem text={t('specimenType', 'Select Specimen Type')} value="" /> : null}
                       {specimenTypes.map((type) => (
-                        <SelectItem
-                          key={type.uuid}
-                          text={type.display}
-                          value={type.uuid}
-                        >
+                        <SelectItem key={type.uuid} text={type.display} value={type.uuid}>
                           {type.display}
                         </SelectItem>
                       ))}
@@ -246,48 +206,29 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
             </section>
             <section
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                alignContent: "stretch",
-              }}
-            >
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                alignContent: 'stretch',
+              }}>
               <div>
-                <Checkbox
-                  checked={preferred}
-                  onChange={onChecked}
-                  labelText={"Referred"}
-                  id="test-referred"
-                />
+                <Checkbox checked={preferred} onChange={onChecked} labelText={'Referred'} id="test-referred" />
               </div>
               {preferred && (
-                <div style={{ width: "500px" }}>
+                <div style={{ width: '500px' }}>
                   <section className={styles.section}>
                     <Select
-                      labelText={t("locationReferral", "Referral Location ")}
+                      labelText={t('locationReferral', 'Referral Location ')}
                       id="nextQueueLocation"
                       name="nextQueueLocation"
                       invalidText="Required"
                       value={selectedReferral}
-                      onChange={(event) =>
-                        setSelectedReferral(event.target.value)
-                      }
-                    >
+                      onChange={(event) => setSelectedReferral(event.target.value)}>
                       {!selectedReferral ? (
-                        <SelectItem
-                          text={t(
-                            "selectAreferelPoint",
-                            "Select a referal point"
-                          )}
-                          value=""
-                        />
+                        <SelectItem text={t('selectAreferelPoint', 'Select a referal point')} value="" />
                       ) : null}
                       {referrals.map((referral) => (
-                        <SelectItem
-                          key={referral.uuid}
-                          text={referral.display}
-                          value={referral.display}
-                        >
+                        <SelectItem key={referral.uuid} text={referral.display} value={referral.display}>
                           {referral.display}
                         </SelectItem>
                       ))}
@@ -295,39 +236,34 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
                   </section>
 
                   <section className={styles.section}>
-                    {selectedReferral ===
-                      "3476fd97-71da-4e9c-bf57-2b6318dc0c9f" && (
+                    {selectedReferral === '3476fd97-71da-4e9c-bf57-2b6318dc0c9f' && (
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div style={{ width: "500px" }}>
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}>
+                        <div style={{ width: '500px' }}>
                           <TextInput
                             type="text"
                             id="locationName"
-                            labelText={"Enter Name"}
+                            labelText={'Enter Name'}
                             value={externalReferralName}
                             required={true}
-                            onChange={(e) =>
-                              setExternalReferralName(e.target.value)
-                            }
+                            onChange={(e) => setExternalReferralName(e.target.value)}
                           />
                         </div>
                       </div>
                     )}
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ width: "500px" }}>
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}>
+                      <div style={{ width: '500px' }}>
                         <TextInput
                           type="text"
                           id="enterBarcode"
-                          labelText={"Enter Barcode"}
+                          labelText={'Enter Barcode'}
                           value={barcode}
                           required={true}
                           onChange={(e) => {
@@ -338,15 +274,14 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
                     </div>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ width: "500px" }}>
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}>
+                      <div style={{ width: '500px' }}>
                         <TextInput
                           type="text"
                           id="confirmBarcode"
-                          labelText={"Confirm Barcode"}
+                          labelText={'Confirm Barcode'}
                           value={confirmBarcode}
                           required={true}
                           onChange={(e) => {
@@ -363,10 +298,10 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t("cancel", "Cancel")}
+            {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" onClick={pickLabRequestQueue}>
-            {t("pickPatient", "Pick Lab Request")}
+            {t('pickPatient', 'Pick Lab Request')}
           </Button>
         </ModalFooter>
       </Form>

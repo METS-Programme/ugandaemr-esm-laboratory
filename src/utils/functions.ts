@@ -1,12 +1,8 @@
-import {
-  getGlobalStore,
-  openmrsFetch,
-  restBaseUrl,
-} from "@openmrs/esm-framework";
-import dayjs from "dayjs";
-import useSWR, { mutate } from "swr";
-import { omrsDateFormat } from "../constants";
-import { useEffect, useState } from "react";
+import { getGlobalStore, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import useSWR, { mutate } from 'swr';
+import { omrsDateFormat } from '../constants';
+import { useEffect, useState } from 'react';
 
 export const trimVisitNumber = (visitNumber: string) => {
   if (!visitNumber) {
@@ -22,37 +18,30 @@ export const formatWaitTime = (waitTime: string, t) => {
   const minutes = (hours - rhours) * 60;
   const rminutes = Math.round(minutes);
   if (rhours > 0) {
-    return (
-      rhours +
-      " " +
-      `${t("hoursAnd", "hours and ")}` +
-      rminutes +
-      " " +
-      `${t("minutes", "minutes")}`
-    );
+    return rhours + ' ' + `${t('hoursAnd', 'hours and ')}` + rminutes + ' ' + `${t('minutes', 'minutes')}`;
   } else {
-    return rminutes + " " + `${t("minutes", "minutes")}`;
+    return rminutes + ' ' + `${t('minutes', 'minutes')}`;
   }
 };
 
 export const getTagColor = (waitTime: string) => {
   const num = parseInt(waitTime);
   if (num <= 30) {
-    return "green";
+    return 'green';
   } else if (num > 30 && num <= 45) {
-    return "orange";
+    return 'orange';
   } else {
-    return "red";
+    return 'red';
   }
 };
 
 export const getStatusColor = (fulfillerStatus: string) => {
-  if (fulfillerStatus === "COMPLETED") {
-    return "green";
-  } else if (fulfillerStatus === "IN_PROGRESS") {
-    return "orange";
+  if (fulfillerStatus === 'COMPLETED') {
+    return 'green';
+  } else if (fulfillerStatus === 'IN_PROGRESS') {
+    return 'orange';
   } else {
-    return "red";
+    return 'red';
   }
 };
 
@@ -242,10 +231,7 @@ export interface Creator {
 
 export function useGetPatientByUuid(uuid: string) {
   const apiUrl = `${restBaseUrl}/patient/${uuid}?v=full`;
-  const { data, error, isLoading } = useSWR<{ data: PatientResource }, Error>(
-    apiUrl,
-    openmrsFetch
-  );
+  const { data, error, isLoading } = useSWR<{ data: PatientResource }, Error>(apiUrl, openmrsFetch);
   return {
     patient: data?.data,
     isLoading,
@@ -255,28 +241,28 @@ export function useGetPatientByUuid(uuid: string) {
 
 export function OrderTagStyle(order: any) {
   switch (order?.action) {
-    case "NEW" || "REVISE":
+    case 'NEW' || 'REVISE':
       return {
-        background: "#6F6F6F",
-        color: "white",
+        background: '#6F6F6F',
+        color: 'white',
       };
 
-    case "DISCONTINUE":
+    case 'DISCONTINUE':
       return {
-        background: "green",
-        color: "white",
+        background: 'green',
+        color: 'white',
       };
 
-    case "DECLINED" || "EXCEPTION":
+    case 'DECLINED' || 'EXCEPTION':
       return {
-        background: "red",
-        color: "white",
+        background: 'red',
+        color: 'white',
       };
 
     default:
       return {
-        background: "gray",
-        color: "white",
+        background: 'gray',
+        color: 'white',
       };
   }
 }
@@ -286,9 +272,7 @@ export function extractErrorMessagesFromResponse(errorObject) {
   if (!fieldErrors) {
     return [errorObject?.responseBody?.error?.message ?? errorObject?.message];
   }
-  return Object.values(fieldErrors).flatMap((errors: Array<Error>) =>
-    errors.map((error) => error.message)
-  );
+  return Object.values(fieldErrors).flatMap((errors: Array<Error>) => errors.map((error) => error.message));
 }
 
 // orders date globally
@@ -297,37 +281,28 @@ const initialState = {
 };
 
 export function getStartDate() {
-  return getGlobalStore<{ ordersDate: string | Date }>(
-    "ordersStartDate",
-    initialState
-  );
+  return getGlobalStore<{ ordersDate: string | Date }>('ordersStartDate', initialState);
 }
 
 export function changeStartDate(updatedDate: string | Date) {
   const store = getStartDate();
   store.setState({
-    ordersDate: dayjs(new Date(updatedDate).setHours(0, 0, 0, 0)).format(
-      omrsDateFormat
-    ),
+    ordersDate: dayjs(new Date(updatedDate).setHours(0, 0, 0, 0)).format(omrsDateFormat),
   });
 }
 
 export const useOrderDate = () => {
-  const [currentOrdersDate, setCurrentOrdersDate] = useState(
-    initialState.ordersDate
-  );
+  const [currentOrdersDate, setCurrentOrdersDate] = useState(initialState.ordersDate);
 
   useEffect(() => {
-    getStartDate().subscribe(({ ordersDate }) =>
-      setCurrentOrdersDate(ordersDate.toString())
-    );
+    getStartDate().subscribe(({ ordersDate }) => setCurrentOrdersDate(ordersDate.toString()));
   }, []);
 
   return { currentOrdersDate, setCurrentOrdersDate };
 };
 
 export const handleMutate = (url: string) => {
-  mutate((key) => typeof key === "string" && key.startsWith(url), undefined, {
+  mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, {
     revalidate: true,
   });
 };
