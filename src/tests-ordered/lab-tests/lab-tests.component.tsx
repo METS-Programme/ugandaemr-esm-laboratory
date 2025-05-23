@@ -39,7 +39,6 @@ const LabTests: React.FC<LabTestsProps> = ({ encounter }) => {
       id: item?.uuid,
       order: item?.display,
       orderType: item?.type,
-  
     }));
   }, [encounter]);
 

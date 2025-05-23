@@ -90,9 +90,9 @@ const ReferredOrdersList: React.FC = () => {
   const EditOrder: React.FC<EditOrderProps> = ({ order }) => {
     const handleLaunchWorkspace = useCallback(() => {
       launchWorkspace('pick-order-form-workspace', {
-         order,
-       });
-     }, [order]);
+        order,
+      });
+    }, [order]);
     return <Button kind="ghost" renderIcon={() => <Edit size="16" />} onClick={handleLaunchWorkspace}></Button>;
   };
 

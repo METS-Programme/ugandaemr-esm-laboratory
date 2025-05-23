@@ -173,7 +173,7 @@
         {
             "name": "pick-order-form-workspace",
             "component": "pickOrderFormWorkspace",
-            "title": "Pick Order",
+            "title": "Pick Lab Request",
             "type": "form",
             "canMaximize": true,
             "width": "extra-wide"

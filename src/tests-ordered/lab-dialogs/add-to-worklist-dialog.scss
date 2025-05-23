@@ -1,5 +1,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
 
 
 .radioButton {
@@ -15,16 +17,30 @@ section {
   margin-bottom: spacing.$spacing-04;
 }
 
-.modalBody {
-  padding-bottom: spacing.$spacing-05;
+.body {
+  padding: 1rem;
 }
 
 
 .container {
-  display: "flex";
-  align-items: "center";
-  justify-content: "space-between";
-  align-content: "stretch";
+  background-color: $ui-background;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.button {
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.buttonSet {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .specimenContainer {
@@ -37,4 +53,15 @@ section {
 .inputText {
   display: "flex";
   align-items: "center";
+}
+
+.flexRow{
+  display: 'flex';
+  column-gap: '10px';
+}
+
+.errorMessage {
+  color: #d93025;
+  font-size: 0.875rem;
+  margin: 1rem;
 }

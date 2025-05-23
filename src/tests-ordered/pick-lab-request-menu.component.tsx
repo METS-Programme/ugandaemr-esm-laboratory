@@ -12,7 +12,7 @@ const PickLabRequestActionMenu: React.FC<PickLabRequestActionMenuProps> = ({ ord
   const { t } = useTranslation();
 
   const handleLaunchWorkspace = useCallback(() => {
-   launchWorkspace('pick-order-form-workspace', {
+    launchWorkspace('pick-order-form-workspace', {
       order,
     });
   }, [order]);
