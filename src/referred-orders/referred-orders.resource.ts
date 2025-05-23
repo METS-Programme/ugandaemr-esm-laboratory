@@ -1,17 +1,17 @@
-import { openmrsFetch, restBaseUrl } from "@openmrs/esm-framework";
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 export async function getAllTestOrderResults() {
   const payload = {
-    action: "RUNTASK",
-    tasks: ["Request Viral Results"],
+    action: 'RUNTASK',
+    tasks: ['Request Viral Results'],
   };
   const apiUrl = `${restBaseUrl}/taskaction`;
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: payload,
   });
@@ -19,16 +19,16 @@ export async function getAllTestOrderResults() {
 
 export async function syncAllTestOrders() {
   const payload = {
-    action: "RUNTASK",
-    tasks: ["Send Viral Load Request to Central Server Task"],
+    action: 'RUNTASK',
+    tasks: ['Send Viral Load Request to Central Server Task'],
   };
   const apiUrl = `${restBaseUrl}/taskaction`;
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: payload,
   });
@@ -44,10 +44,10 @@ export async function syncSelectedTestOrders(orders: string[]) {
 
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: payload,
   });
@@ -62,10 +62,10 @@ export async function syncSelectedTestOrderResults(orders: string[]) {
 
   const abortController = new AbortController();
   return await openmrsFetch(apiUrl, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: payload,
   });

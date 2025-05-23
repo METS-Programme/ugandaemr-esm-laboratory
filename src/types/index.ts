@@ -1,13 +1,13 @@
-import { OpenmrsResource } from "@openmrs/esm-framework";
+import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export enum SearchTypes {
-  BASIC = "basic",
-  ADVANCED = "advanced",
-  SEARCH_RESULTS = "search_results",
-  SCHEDULED_VISITS = "scheduled-visits",
-  VISIT_FORM = "visit_form",
-  QUEUE_SERVICE_FORM = "queue_service_form",
-  QUEUE_ROOM_FORM = "queue_room_form",
+  BASIC = 'basic',
+  ADVANCED = 'advanced',
+  SEARCH_RESULTS = 'search_results',
+  SCHEDULED_VISITS = 'scheduled-visits',
+  VISIT_FORM = 'visit_form',
+  QUEUE_SERVICE_FORM = 'queue_service_form',
+  QUEUE_ROOM_FORM = 'queue_room_form',
 }
 
 export interface Patient {
@@ -72,9 +72,7 @@ export interface Order {
   dateStopped?: Date | null;
   dose: number;
   dosingInstructions: string | null;
-  dosingType?:
-    | "org.openmrs.FreeTextDosingInstructions"
-    | "org.openmrs.SimpleDosingInstructions";
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   doseUnits: {
     uuid: string;
     display: string;
@@ -226,14 +224,14 @@ export interface ObsMetaInfo {
 }
 
 export type OBSERVATION_INTERPRETATION =
-  | "NORMAL"
-  | "HIGH"
-  | "CRITICALLY_HIGH"
-  | "OFF_SCALE_HIGH"
-  | "LOW"
-  | "CRITICALLY_LOW"
-  | "OFF_SCALE_LOW"
-  | "--";
+  | 'NORMAL'
+  | 'HIGH'
+  | 'CRITICALLY_HIGH'
+  | 'OFF_SCALE_HIGH'
+  | 'LOW'
+  | 'CRITICALLY_LOW'
+  | 'OFF_SCALE_LOW'
+  | '--';
 export interface PatientProgram {
   uuid: string;
   display: string;
@@ -353,7 +351,7 @@ export interface Resource {
   id: string;
   name: string;
   resourceType: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
   meta?: {
     tag?: Array<{
       code: string;

@@ -1,26 +1,15 @@
-import {
-  Button,
-  Form,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  TextInput,
-  InlineLoading,
-} from "@carbon/react";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { usePatient } from "@openmrs/esm-framework";
-import styles from "./results-summary.scss";
+import { Button, Form, ModalBody, ModalFooter, ModalHeader, TextInput, InlineLoading } from '@carbon/react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { usePatient } from '@openmrs/esm-framework';
+import styles from './results-summary.scss';
 
 interface SendEmailDialogProps {
   patientUuid: string;
   closeModal: () => void;
 }
 
-const SendEmailDialog: React.FC<SendEmailDialogProps> = ({
-  patientUuid,
-  closeModal,
-}) => {
+const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
 
   const [email, setEmail] = useState();
@@ -32,10 +21,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({
   return (
     <>
       <Form onSubmit={sendEmail}>
-        <ModalHeader
-          closeModal={closeModal}
-          title={t("sendResults", "Send Results")}
-        />
+        <ModalHeader closeModal={closeModal} title={t('sendResults', 'Send Results')} />
         <ModalBody>
           {isLoading && (
             <InlineLoading
@@ -62,9 +48,9 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>
-            {t("cancel", "Cancel")}
+            {t('cancel', 'Cancel')}
           </Button>
-          <Button type="submit">{t("sendEmail", "Send Email")}</Button>
+          <Button type="submit">{t('sendEmail', 'Send Email')}</Button>
         </ModalFooter>
       </Form>
     </>

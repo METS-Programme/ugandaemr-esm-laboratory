@@ -1,5 +1,5 @@
-import React from "react";
-import ReferredOrdersList from "../referred-orders/referred-orders.component";
+import React from 'react';
+import ReferredOrdersList from '../referred-orders/referred-orders.component';
 
 const ReferredComponent = () => {
   return (

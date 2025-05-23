@@ -1,24 +1,22 @@
-import React, { useState } from "react";
-import { Button, InlineLoading } from "@carbon/react";
-import { showSnackbar } from "@openmrs/esm-framework";
-import { syncSelectedTestOrderResults } from "./referred-orders.resource";
+import React, { useState } from 'react';
+import { Button, InlineLoading } from '@carbon/react';
+import { showSnackbar } from '@openmrs/esm-framework';
+import { syncSelectedTestOrderResults } from './referred-orders.resource';
 
 interface RequestResultsActionProps {
   orders: string[];
 }
 
-const RequestResultsAction: React.FC<RequestResultsActionProps> = ({
-  orders,
-}) => {
+const RequestResultsAction: React.FC<RequestResultsActionProps> = ({ orders }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleRequestResults = async () => {
     if (orders.length === 0) {
       showSnackbar({
-        title: "Request ViralLoad",
-        subtitle: "No orders selected to request results.",
-        kind: "warning",
+        title: 'Request ViralLoad',
+        subtitle: 'No orders selected to request results.',
+        kind: 'warning',
       });
       return;
     }
@@ -31,23 +29,23 @@ const RequestResultsAction: React.FC<RequestResultsActionProps> = ({
 
       if (response.status === 201) {
         showSnackbar({
-          title: "Request ViralLoad",
-          subtitle: "Request sent successfully.",
-          kind: "success",
+          title: 'Request ViralLoad',
+          subtitle: 'Request sent successfully.',
+          kind: 'success',
         });
         setIsSuccess(true);
       } else {
         showSnackbar({
-          title: "Request ViralLoad",
+          title: 'Request ViralLoad',
           subtitle: `Unexpected response status: ${response.status}`,
-          kind: "error",
+          kind: 'error',
         });
       }
     } catch (error: any) {
       showSnackbar({
-        title: "Request ViralLoad",
-        subtitle: `Request failed: ${error?.message ?? "Unknown error"}`,
-        kind: "error",
+        title: 'Request ViralLoad',
+        subtitle: `Request failed: ${error?.message ?? 'Unknown error'}`,
+        kind: 'error',
       });
     } finally {
       // Small delay to show the success state if applicable
@@ -62,16 +60,11 @@ const RequestResultsAction: React.FC<RequestResultsActionProps> = ({
     <div>
       {isSubmitting ? (
         <InlineLoading
-          description={isSuccess ? "Request sent!" : "Requesting results..."}
-          status={isSuccess ? "finished" : "active"}
+          description={isSuccess ? 'Request sent!' : 'Requesting results...'}
+          status={isSuccess ? 'finished' : 'active'}
         />
       ) : (
-        <Button
-          kind="ghost"
-          size="sm"
-          onClick={handleRequestResults}
-          disabled={orders.length === 0}
-        >
+        <Button kind="ghost" size="sm" onClick={handleRequestResults} disabled={orders.length === 0}>
           Request Results
         </Button>
       )}

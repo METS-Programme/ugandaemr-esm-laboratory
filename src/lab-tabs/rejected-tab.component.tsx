@@ -1,5 +1,5 @@
-import React from "react";
-import RejectedTestsList from "../reject-order/rejected-tests-list.component";
+import React from 'react';
+import RejectedTestsList from '../reject-order/rejected-tests-list.component';
 
 const RejectedComponent = () => {
   return (

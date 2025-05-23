@@ -168,5 +168,15 @@
             "component": "rejectOrderButton",
             "slot": "order-actions-slot"
         }
+    ],
+    "workspaces": [
+        {
+            "name": "pick-order-form-workspace",
+            "component": "pickOrderFormWorkspace",
+            "title": "Pick Lab Request",
+            "type": "form",
+            "canMaximize": true,
+            "width": "extra-wide"
+        }
     ]
 }

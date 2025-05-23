@@ -1,12 +1,7 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Result, useGetOrdersWorklist } from "../work-list/work-list.resource";
-import {
-  formatDate,
-  parseDate,
-  showModal,
-  usePagination,
-} from "@openmrs/esm-framework";
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Result, useGetOrdersWorklist } from '../work-list/work-list.resource';
+import { formatDate, parseDate, showModal, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -24,12 +19,12 @@ import {
   Layer,
   Tile,
   Button,
-} from "@carbon/react";
+} from '@carbon/react';
 
-import styles from "./review-list.scss";
-import { Add } from "@carbon/react/icons";
-import { getStatusColor, useOrderDate } from "../utils/functions";
-import { REFERINSTRUCTIONS } from "../constants";
+import styles from './review-list.scss';
+import { Add } from '@carbon/react/icons';
+import { getStatusColor, useOrderDate } from '../utils/functions';
+import { REFERINSTRUCTIONS } from '../constants';
 
 interface ReviewlistProps {
   fulfillerStatus: string;
@@ -39,13 +34,10 @@ interface ApproveResultMenuProps {
   orderItem: Result;
 }
 
-const ApproveTestMenu: React.FC<ApproveResultMenuProps> = ({
-  orderItem,
-  encounterUuid,
-}) => {
+const ApproveTestMenu: React.FC<ApproveResultMenuProps> = ({ orderItem, encounterUuid }) => {
   const { t } = useTranslation();
   const launchReviewItemModal = useCallback(() => {
-    const dispose = showModal("review-item-dialog", {
+    const dispose = showModal('review-item-dialog', {
       encounterUuid,
       orderItem,
       closeModal: () => dispose(),
@@ -56,10 +48,9 @@ const ApproveTestMenu: React.FC<ApproveResultMenuProps> = ({
     <Button
       kind="ghost"
       onClick={launchReviewItemModal}
-      iconDescription={t("approveTest", "Approve Results")}
-      renderIcon={(props) => <Add size={16} {...props} />}
-    >
-      {t("approveTest", "Approve Results")}
+      iconDescription={t('approveTest', 'Approve Results')}
+      renderIcon={(props) => <Add size={16} {...props} />}>
+      {t('approveTest', 'Approve Results')}
     </Button>
   );
 };
@@ -68,46 +59,37 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
   const { t } = useTranslation();
 
   const { currentOrdersDate } = useOrderDate();
-  const { data: reviewOrderEntries, isLoading } = useGetOrdersWorklist(
-    fulfillerStatus,
-    currentOrdersDate
-  );
+  const { data: reviewOrderEntries, isLoading } = useGetOrdersWorklist(fulfillerStatus, currentOrdersDate);
 
   const filtered = reviewOrderEntries?.filter(
     (item) =>
-      item?.fulfillerStatus === "IN_PROGRESS" &&
+      item?.fulfillerStatus === 'IN_PROGRESS' &&
       item?.dateStopped !== null &&
-      (item?.instructions !== REFERINSTRUCTIONS ||
-        item?.instructions === null ||
-        item?.instructions === undefined)
+      (item?.instructions !== REFERINSTRUCTIONS || item?.instructions === null || item?.instructions === undefined),
   );
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
 
-  const {
-    goTo,
-    results: paginatedReviewOrderEntries,
-    currentPage,
-  } = usePagination(filtered, currentPageSize);
+  const { goTo, results: paginatedReviewOrderEntries, currentPage } = usePagination(filtered, currentPageSize);
 
   // get picked orders
   let columns = [
-    { id: 0, header: t("date", "Date"), key: "date" },
+    { id: 0, header: t('date', 'Date'), key: 'date' },
 
-    { id: 1, header: t("orderNumber", "Order Number"), key: "orderNumber" },
-    { id: 2, header: t("artNumber", "Art Number"), key: "artNumber" },
-    { id: 3, header: t("patient", "Patient"), key: "patient" },
+    { id: 1, header: t('orderNumber', 'Order Number'), key: 'orderNumber' },
+    { id: 2, header: t('artNumber', 'Art Number'), key: 'artNumber' },
+    { id: 3, header: t('patient', 'Patient'), key: 'patient' },
 
     {
       id: 4,
-      header: t("accessionNumber", "Accession Number"),
-      key: "accessionNumber",
+      header: t('accessionNumber', 'Accession Number'),
+      key: 'accessionNumber',
     },
-    { id: 5, header: t("test", "Test"), key: "test" },
-    { id: 6, header: t("status", "Status"), key: "status" },
-    { id: 7, header: t("orderer", "Ordered By"), key: "orderer" },
-    { id: 8, header: t("urgency", "Urgency"), key: "urgency" },
+    { id: 5, header: t('test', 'Test'), key: 'test' },
+    { id: 6, header: t('status', 'Status'), key: 'status' },
+    { id: 7, header: t('orderer', 'Ordered By'), key: 'orderer' },
+    { id: 8, header: t('urgency', 'Urgency'), key: 'urgency' },
   ];
 
   const tableRows = useMemo(() => {
@@ -118,24 +100,15 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
       patient: entry?.patient?.names[0]?.display,
       orderNumber: entry?.orderNumber,
       artNumber: entry.patient?.identifiers
-        .find(
-          (item) =>
-            item?.identifierType?.uuid ===
-            "e1731641-30ab-102d-86b0-7a5022ba4115"
-        )
-        ?.display.split("=")[1]
+        .find((item) => item?.identifierType?.uuid === 'e1731641-30ab-102d-86b0-7a5022ba4115')
+        ?.display.split('=')[1]
         .trim(),
       accessionNumber: entry?.accessionNumber,
       test: entry?.concept?.display,
       action: entry?.action,
       status: (
-        <span
-          className={styles.statusContainer}
-          style={{ color: `${getStatusColor(entry?.fulfillerStatus)}` }}
-        >
-          {entry?.fulfillerStatus === "IN_PROGRESS"
-            ? "IN_REVIEW"
-            : entry?.fulfillerStatus}
+        <span className={styles.statusContainer} style={{ color: `${getStatusColor(entry?.fulfillerStatus)}` }}>
+          {entry?.fulfillerStatus === 'IN_PROGRESS' ? 'IN_REVIEW' : entry?.fulfillerStatus}
         </span>
       ),
       orderer: entry?.orderer?.display,
@@ -150,26 +123,18 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
   if (paginatedReviewOrderEntries?.length >= 0) {
     return (
       <DataTable rows={tableRows} headers={columns} useZebraStyles>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getTableProps,
-          getRowProps,
-          onInputChange,
-        }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
             <TableToolbar
               style={{
-                position: "static",
-              }}
-            >
+                position: 'static',
+              }}>
               <TableToolbarContent>
                 <Layer>
                   <TableToolbarSearch
                     expanded
                     onChange={onInputChange}
-                    placeholder={t("searchThisList", "Search this list")}
+                    placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
                   />
                 </Layer>
@@ -179,9 +144,7 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
+                    <TableHeader {...getHeaderProps({ header })}>{header.header?.content ?? header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
@@ -191,17 +154,12 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
                     <React.Fragment key={row.id}>
                       <TableRow {...getRowProps({ row })} key={row.id}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
-                            {cell.value?.content ?? cell.value}
-                          </TableCell>
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
                           <ApproveTestMenu
                             orderItem={paginatedReviewOrderEntries[index]}
-                            encounterUuid={
-                              paginatedReviewOrderEntries[index]?.encounter
-                                ?.uuid
-                            }
+                            encounterUuid={paginatedReviewOrderEntries[index]?.encounter?.uuid}
                           />
                         </TableCell>
                       </TableRow>
@@ -214,9 +172,7 @@ const ReviewList: React.FC<ReviewlistProps> = ({ fulfillerStatus }) => {
               <div className={styles.tileContainer}>
                 <Tile className={styles.tile}>
                   <div className={styles.tileContent}>
-                    <p className={styles.content}>
-                      {t("noReviewListToDisplay", "No review list to display")}
-                    </p>
+                    <p className={styles.content}>{t('noReviewListToDisplay', 'No review list to display')}</p>
                   </div>
                 </Tile>
               </div>
