@@ -15,7 +15,7 @@ import { Order } from '../../types/patient-queues';
 import { extractErrorMessagesFromResponse, handleMutate } from '../../utils/functions';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 type AddToWorklistDialogProps = DefaultWorkspaceProps & {
   order: Order;
@@ -27,7 +27,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
   const { specimenTypes } = useSpecimenTypes();
   const { referrals } = useReferralLocations();
 
-  const [preferred, setPreferred] = useState(false);
+  const [referred, setReferred] = useState(false);
   const [specimenID, setSpecimenID] = useState('');
   const [specimenType, setSpecimenType] = useState('');
   const [selectedReferral, setSelectedReferral] = useState('');
@@ -79,7 +79,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
     mode: 'all',
     resolver: zodResolver(generateSpecimenIdSchema),
     defaultValues: {
-      referenceLab: preferred ? extractLetters(selectedReferral) : '',
+      referenceLab: referred ? extractLetters(selectedReferral) : '',
     },
   });
 
@@ -89,7 +89,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
       specimenSourceId: specimenType,
       unProcessedOrders: '',
       patientQueueId: '',
-      referenceLab: preferred ? extractLetters(selectedReferral) : '',
+      referenceLab: referred ? extractLetters(selectedReferral) : '',
     };
 
     try {
@@ -115,7 +115,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
   };
 
   const onChecked = () => {
-    setPreferred(!preferred);
+    setReferred(!referred);
   };
 
   const generateId = async () => {
@@ -160,7 +160,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
           </div>
         )}
 
-        <FormGroup title={preferred ? t('barcode', 'Barcode') : t('specimenID', 'Specimen ID')}>
+        <FormGroup title={referred ? t('barcode', 'Barcode') : t('specimenID', 'Specimen ID')}>
           <div className={styles.flexRow}>
             <Controller
               name="specimenId"
@@ -170,12 +170,12 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
                   {...field}
                   type="text"
                   id="specimenId"
-                  labelText={preferred ? t('barcode', 'Barcode') : t('specimenID', 'Specimen ID')}
+                  labelText={referred ? t('barcode', 'Barcode') : t('specimenID', 'Specimen ID')}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
-                  readOnly={config.enableSpecimenIdAutoGeneration || preferred}
-                  hideReadOnly={preferred}
-                  value={specimenID}
+                  readOnly={config.enableSpecimenIdAutoGeneration || referred}
+                  hideReadOnly={referred}
+                  value={field.value || specimenID || barcode}
                   onChange={(e) => {
                     field.onChange(e);
                     setSpecimenID(e.target.value);
@@ -189,7 +189,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
                 hasIconOnly
                 onClick={generateId}
                 renderIcon={(props) => <Renew size={16} {...props} />}
-                disabled={preferred}
+                disabled={referred}
               />
             )}
           </div>
@@ -224,8 +224,8 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
         </FormGroup>
 
         <FormGroup>
-          <Checkbox checked={preferred} onChange={onChecked} labelText={'Referred'} id="test-referred" />
-          {preferred && (
+          <Checkbox checked={referred} onChange={onChecked} labelText={'Referred'} id="test-referred" />
+          {referred && (
             <>
               <FormGroup title={t('locationReferral', 'Referral Location ')}>
                 <div className={styles.flexRow}>
@@ -277,19 +277,24 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
                     name="barcode"
                     control={control}
                     render={({ field, fieldState }) => (
-                      <TextInput
-                        {...field}
-                        type="text"
-                        id="barcode"
-                        labelText="Enter Barcode"
-                        invalid={!!fieldState.error}
-                        invalidText={fieldState.error?.message}
-                        value={barcode}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setBarcode(e.target.value);
-                        }}
-                      />
+                      <div style={{ width: '100%' }}>
+                        <TextInput
+                          {...field}
+                          type="text"
+                          id="barcode"
+                          labelText="Enter Barcode"
+                          invalid={!!fieldState.error}
+                          invalidText={fieldState.error?.message}
+                          value={barcode}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setBarcode(e.target.value);
+                          }}
+                        />
+                        <div style={{ textAlign: 'right', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                          {barcode.length} / 10
+                        </div>
+                      </div>
                     )}
                   />
                 </div>
@@ -301,19 +306,24 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspac
                     name="confirmBarcode"
                     control={control}
                     render={({ field, fieldState }) => (
-                      <TextInput
-                        {...field}
-                        type="text"
-                        id="confirmBarcode"
-                        labelText="Confirm Barcode"
-                        invalid={!!fieldState.error}
-                        invalidText={fieldState.error?.message}
-                        value={confirmBarcode}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setConfirmBarcode(e.target.value);
-                        }}
-                      />
+                      <div style={{ width: '100%' }}>
+                        <TextInput
+                          {...field}
+                          type="text"
+                          id="confirmBarcode"
+                          labelText="Confirm Barcode"
+                          invalid={!!fieldState.error}
+                          invalidText={fieldState.error?.message}
+                          value={confirmBarcode}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setConfirmBarcode(e.target.value);
+                          }}
+                        />
+                        <div style={{ textAlign: 'right', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                          {confirmBarcode.length} / 10
+                        </div>
+                      </div>
                     )}
                   />
                 </div>
