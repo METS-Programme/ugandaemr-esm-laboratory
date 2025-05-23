@@ -3,16 +3,15 @@ import {
   Button,
   Form,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   Select,
   SelectItem,
   Checkbox,
-  TextInput,
+  TextInput,ButtonSet
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './add-to-worklist-dialog.scss';
-import { restBaseUrl, showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, restBaseUrl, showNotification, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { Renew } from '@carbon/react/icons';
 import {
   GenerateSpecimenId,
@@ -24,13 +23,11 @@ import {
 import { Order } from '../../types/patient-queues';
 import { extractErrorMessagesFromResponse, handleMutate } from '../../utils/functions';
 
-interface AddToWorklistDialogProps {
-  queueId;
+type AddToWorklistDialogProps = DefaultWorkspaceProps & {
   order: Order;
-  closeModal: () => void;
 }
 
-const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, order, closeModal }) => {
+const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ closeWorkspace, order }) => {
   const { t } = useTranslation();
 
   const [preferred, setPreferred] = useState(false);
@@ -60,7 +57,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, orde
       sampleId: specimenID,
       specimenSourceId: specimenType,
       unProcessedOrders: '',
-      patientQueueId: queueId,
+      patientQueueId: "",
       referenceLab: preferred ? extractLetters(selectedReferral) : '',
     };
 
@@ -72,7 +69,7 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, orde
           kind: 'success',
           subtitle: t('pickSuccessfully', 'You have successfully picked an Order'),
         });
-        closeModal();
+        closeWorkspace();
         handleMutate(`${restBaseUrl}/order`);
       },
       (error) => {
@@ -128,9 +125,8 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, orde
   return (
     <div>
       <Form onSubmit={pickLabRequestQueue}>
-        <ModalHeader closeModal={closeModal} title={t('pickRequest', `Test : ${order?.concept?.display}`)} />
-        <ModalBody>
-          <div className={styles.modalBody}>
+        <ModalHeader closeModal={closeWorkspace} title={t('pickRequest', `Test : ${order?.concept?.display}`)} />
+        <div className={styles.modalBody}>
             <section className={styles.section}>
               <div
                 style={{
@@ -295,15 +291,14 @@ const AddToWorklistDialog: React.FC<AddToWorklistDialogProps> = ({ queueId, orde
               )}
             </section>
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button kind="secondary" onClick={closeModal}>
+       <ButtonSet>
+       <Button kind="secondary" onClick={closeWorkspace}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" onClick={pickLabRequestQueue}>
             {t('pickPatient', 'Pick Lab Request')}
           </Button>
-        </ModalFooter>
+       </ButtonSet>
       </Form>
     </div>
   );

@@ -57,7 +57,7 @@ export const laboratoryOrderDashboardLink = getSyncLifecycle(
 );
 export const laboratoryOrderComponent = getSyncLifecycle(laboratoryOrder, options);
 
-export const addToWorklistDialog = getSyncLifecycle(addToWorklist, options);
+export const pickOrderFormWorkspace = getSyncLifecycle(addToWorklist, options);
 
 export const sendEmailDialog = getSyncLifecycle(sendEmail, options);
 

@@ -14,14 +14,13 @@ import {
 import { ErrorState } from '@openmrs/esm-framework';
 import { Encounter } from '../../types/patient-queues';
 import styles from '../laboratory-queue.scss';
-import PickLabRequestActionMenu from '../pick-lab-request-menu.component';
 
 interface LabTestsProps {
   encounter: Encounter;
   queueId: string;
 }
 
-const LabTests: React.FC<LabTestsProps> = ({ encounter, queueId }) => {
+const LabTests: React.FC<LabTestsProps> = ({ encounter }) => {
   const { t } = useTranslation();
   let columns = [
     { id: 1, header: t('order', 'Order'), key: 'order', align: 'left' },
@@ -40,7 +39,7 @@ const LabTests: React.FC<LabTestsProps> = ({ encounter, queueId }) => {
       id: item?.uuid,
       order: item?.display,
       orderType: item?.type,
-      actions: <PickLabRequestActionMenu closeModal={() => true} order={item} />,
+  
     }));
   }, [encounter]);
 

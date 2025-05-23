@@ -1,11 +1,15 @@
-import React, { useMemo, useState } from 'react';
-import { useGetNewReferredOrders } from '../work-list/work-list.resource';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Result, useGetNewReferredOrders } from '../work-list/work-list.resource';
 import { useTranslation } from 'react-i18next';
+import { Edit } from '@carbon/react/icons';
+
 import {
   ConfigurableLink,
   formatDate,
+  launchWorkspace,
   parseDate,
   restBaseUrl,
+  showModal,
   showSnackbar,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -45,6 +49,10 @@ import {
 
 type SyncView = 'NOT_SYNCED' | 'SYNCED';
 
+interface EditOrderProps {
+  order: Result;
+}
+
 const ReferredOrdersList: React.FC = () => {
   const { t } = useTranslation();
 
@@ -78,6 +86,15 @@ const ReferredOrdersList: React.FC = () => {
     results: paginatedReferredOrderEntries,
     currentPage,
   } = usePagination(referredOrderList, currentPageSize);
+
+  const EditOrder: React.FC<EditOrderProps> = ({ order }) => {
+    const handleLaunchWorkspace = useCallback(() => {
+      launchWorkspace('pick-order-form-workspace', {
+         order,
+       });
+     }, [order]);
+    return <Button kind="ghost" renderIcon={() => <Edit size="16" />} onClick={handleLaunchWorkspace}></Button>;
+  };
 
   const handleSyncSelectedTestOrders = async (selectedRows: any[]) => {
     if (selectedRows.length === 0) {
@@ -240,7 +257,8 @@ const ReferredOrdersList: React.FC = () => {
     { id: 5, header: t('test', 'Test'), key: 'test' },
     { id: 6, header: t('status', 'Status'), key: 'status' },
     { id: 7, header: t('orderer', 'Ordered By'), key: 'orderer' },
-    { id: 8, header: t('message', 'Message'), key: 'message' },
+    { id: 8, header: t('actions', 'Actions'), key: 'actions' },
+    { id: 9, header: t('message', 'Message'), key: 'message' },
   ];
   const tableRows = useMemo(() => {
     return paginatedReferredOrderEntries.map((entry, index) => ({
@@ -270,6 +288,7 @@ const ReferredOrdersList: React.FC = () => {
       ),
       orderer: entry?.order?.orderer?.display,
       orderType: entry?.order?.orderType?.display,
+      actions: <EditOrder order={paginatedReferredOrderEntries[index]} />,
       message: paginatedReferredOrderEntries[index]?.syncTask?.status,
     }));
   }, [paginatedReferredOrderEntries]);

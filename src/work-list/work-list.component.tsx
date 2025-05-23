@@ -77,7 +77,7 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
     );
   };
 
-  const EditOrder: React.FC<ResultsOrderProps> = ({ order }) => {
+  const EditOrder: React.FC<EditOrderProps> = ({ order }) => {
     return <Button kind="ghost" renderIcon={() => <Edit size="16" />}></Button>;
   };
 
@@ -146,6 +146,7 @@ const WorkList: React.FC<WorklistProps> = ({ fulfillerStatus }) => {
           <>
             <ResultsOrder patientUuid={entry?.patient?.uuid} order={paginatedWorkListEntries[index]} />
             <RejectOrder order={paginatedWorkListEntries[index]} />
+            <EditOrder order={paginatedWorkListEntries[index]} />
           </>
         ),
       },
