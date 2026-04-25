@@ -1,0 +1,55 @@
+name: Monthly Dependency Update
+on:
+  schedule:
+    - cron: '0 9 1 * *'  # 9 AM UTC, 1st of month
+  workflow_dispatch:
+
+jobs:
+  monthly-dependency-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check for updates
+        run: |
+          npm install -g npm-check-updates
+          ncu --json > monthly-dependencies.json
+
+      - name: Review updates
+        run: |
+          echo "📊 Monthly Dependency Review"
+          cat monthly-dependencies.json
+
+      - name: Run security audit
+        run: yarn audit --level moderate
+
+      - name: Run tests
+        run: yarn test -- --passWithNoTests
+
+      - name: Check for breaking changes
+        run: |
+          ncu --targetMinor --json > safe-updates.json
+          SAFE_UPDATES=$(jq 'length' safe-updates.json)
+          echo "Safe updates available: $SAFE_UPDATES"
+
+      - name: Create PR if safe updates exist
+        if: $SAFE_UPDATES -gt 0
+        run: |
+          ncu -u --targetMinor
+          yarn install
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout -b chore/monthly-dependency-updates
+          git add package.json yarn.lock
+          git commit -m "chore: monthly dependency updates"
+          git push origin chore/monthly-dependency-updates
+          gh pr create --title "chore: monthly dependency updates" \
+            --body "Automated monthly dependency review. Updates:\n$(cat safe-updates.json)"

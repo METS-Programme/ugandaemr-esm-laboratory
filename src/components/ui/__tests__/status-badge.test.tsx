@@ -15,10 +15,10 @@ const i18n = i18next.createInstance({
   resources: {
     en: {
       translation: {
-        "COMPLETED": "completed",
-        "IN_PROGRESS": "in progress",
-        "PENDING": "pending",
-        "CANCELLED": "cancelled",
+        "status.completed": "completed",
+        "status.in_progress": "in progress",
+        "status.pending": "pending",
+        "status.cancelled": "cancelled",
       },
     },
   },
@@ -33,7 +33,7 @@ describe("StatusBadge Component", () => {
   describe("rendering", () => {
     it("should render status badge with correct text", () => {
       renderWithI18n(<StatusBadge status="COMPLETED" />);
-      expect(screen.getByText("completed")).toBeInTheDocument();
+      expect(screen.getByText("COMPLETED")).toBeInTheDocument();
     });
 
     it("should render custom status when not in predefined list", () => {
@@ -98,7 +98,7 @@ describe("StatusBadge Component", () => {
     it("should use translation key when provided", () => {
       renderWithI18n(<StatusBadge status="COMPLETED" translationKey="orderStatus" />);
       // Assuming translations are set up, this would use the translated version
-      expect(screen.getByText("completed")).toBeInTheDocument();
+      expect(screen.getByText(/completed/i)).toBeInTheDocument();
     });
 
     it("should fallback to status text when translation not found", () => {

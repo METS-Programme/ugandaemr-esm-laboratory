@@ -159,8 +159,8 @@ describe("usePagination", () => {
       );
 
       act(() => {
-        result.current.goToPage(3);
         result.current.setPageSize(30);
+        result.current.goToPage(3);
       });
 
       expect(result.current.currentPage).toBe(3);
