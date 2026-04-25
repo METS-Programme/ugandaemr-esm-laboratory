@@ -1,7 +1,12 @@
-import { FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
+import {
+  FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  useConfig,
+} from "@openmrs/esm-framework";
+import { useMemo } from "react";
+import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 
 export interface QueueRoomsResponse {
   uuid: string;
@@ -84,11 +89,16 @@ export interface ParentLocation {
 // get queue rooms
 export function useQueueRoomLocations(currentQueueLocation: string) {
   const apiUrl = `${restBaseUrl}/location/${currentQueueLocation}?v=full`;
-  const { data, error, isLoading } = useSWR<{ data: QueueRoomsResponse }>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: QueueRoomsResponse }>(
+    apiUrl,
+    openmrsFetch
+  );
 
   const queueRoomLocations = useMemo(
-    () => data?.data?.parentLocation?.childLocations?.map((response) => response) ?? [],
-    [data?.data?.parentLocation?.childLocations],
+    () =>
+      data?.data?.parentLocation?.childLocations?.map((response) => response) ??
+      [],
+    [data?.data?.parentLocation?.childLocations]
   );
   return {
     queueRoomLocations: queueRoomLocations ? queueRoomLocations : [],
@@ -102,7 +112,10 @@ export function useReferralLocations() {
   const config = useConfig();
   const { laboratoryReferalDestinationUuid } = config;
   const apiUrl = `${restBaseUrl}/concept/${laboratoryReferalDestinationUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(
+    apiUrl,
+    openmrsFetch
+  );
 
   return {
     referrals: data ? data?.data?.answers : [],
@@ -116,7 +129,10 @@ export function useSpecimenTypes() {
   const { laboratorySpecimenTypeConcept } = config;
 
   const apiUrl = `${restBaseUrl}/concept/${laboratorySpecimenTypeConcept}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(
+    apiUrl,
+    openmrsFetch
+  );
 
   let specimenTypes = [];
   if (data) {
@@ -137,21 +153,32 @@ export function useSpecimenTypes() {
 export async function GenerateSpecimenId(uuid: string) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/generatesampleId?uuid=${uuid}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     signal: abortController.signal,
   });
 }
 
 // update Order
-export async function UpdateOrder(uuid: string, body: any) {
+export interface OrderUpdatePayload {
+  fulfillerStatus?: string;
+  fulfillerComment?: string;
+  accessionNumber?: string;
+  sampleId?: string;
+  specimenSourceId?: string;
+  unProcessedOrders?: string;
+  patientQueueId?: string;
+  referenceLab?: string;
+}
+
+export async function UpdateOrder(uuid: string, body: OrderUpdatePayload) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/accessionorder/${uuid}`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     signal: abortController.signal,
     body: body,
@@ -162,24 +189,27 @@ export async function GetOrderByUuid(uuid: string) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/order/${uuid}`, {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     signal: abortController.signal,
   });
 }
 
-export function extractLetters(statement: string, extractUppercase: boolean = true): string {
-  const words = statement.split(' ');
-  let result = '';
+export function extractLetters(
+  statement: string,
+  extractUppercase: boolean = true
+): string {
+  const words = statement.split(" ");
+  let result = "";
 
   for (const word of words) {
     for (const char of word) {
       if (extractUppercase) {
-        if (char >= 'A' && char <= 'Z') {
+        if (char >= "A" && char <= "Z") {
           result += char;
         }
       } else {
-        if (char >= 'a' && char <= 'z') {
+        if (char >= "a" && char <= "z") {
           result += char;
         }
       }

@@ -1,14 +1,22 @@
-import React, { useMemo } from 'react';
-import styles from './result-form.scss';
-import { Button, InlineLoading, ModalBody, ModalFooter } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { closeOverlay } from '../components/overlay/hook';
-import { ExtensionSlot, restBaseUrl, showNotification, showSnackbar, usePatient } from '@openmrs/esm-framework';
-import { useGetOrderConceptByUuid, UpdateOrderResult } from './result-form.resource';
-import { Result } from '../work-list/work-list.resource';
-import ResultFormField from './result-form-field.component';
-import { useForm } from 'react-hook-form';
-import { handleMutate } from '../utils/functions';
+import React, { useMemo } from "react";
+import styles from "./result-form.scss";
+import { Button, InlineLoading, ModalBody, ModalFooter } from "@carbon/react";
+import { useTranslation } from "react-i18next";
+import { closeOverlay } from "../components/overlay/hook";
+import {
+  ExtensionSlot,
+  showNotification,
+  showSnackbar,
+  usePatient,
+} from "@openmrs/esm-framework";
+import {
+  useGetOrderConceptByUuid,
+  UpdateOrderResult,
+} from "./result-form.resource";
+import { Result } from "../work-list/work-list.resource";
+import ResultFormField from "./result-form-field.component";
+import { useForm } from "react-hook-form";
+import { hasValue, validateResults } from "./result-form-validation.utils";
 
 interface ResultFormProps {
   patientUuid: string;
@@ -28,7 +36,9 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
   });
 
   const { patient, isLoading } = usePatient(patientUuid);
-  const { concept, isLoading: isLoadingConcepts } = useGetOrderConceptByUuid(order.concept.uuid);
+  const { concept, isLoading: isLoadingConcepts } = useGetOrderConceptByUuid(
+    order.concept.uuid
+  );
 
   const bannerState = useMemo(() => {
     if (patient) {
@@ -46,52 +56,98 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
 
   const onSubmit = (data, e) => {
     e.preventDefault();
+
+    // Validate results before proceeding
+    const formValues = getValues();
+    const validation = validateResults(concept, formValues, t);
+    if (!validation.isValid) {
+      showNotification({
+        title: t("validationError", "Validation Error"),
+        kind: "error",
+        critical: false,
+        description: validation.errors.join(", "),
+      });
+      return;
+    }
+
     // assign result to test order
     const documentedValues = getValues();
     let obsValue = [];
 
     if (concept.set && concept.setMembers.length > 0) {
+      // Handle panel/set tests - only include members with values
       let groupMembers = [];
       concept.setMembers.forEach((member) => {
         let value;
-        if (member.datatype.display === 'Numeric' || member.datatype.display === 'Text') {
+        if (
+          member.datatype.display === "Numeric" ||
+          member.datatype.display === "Text"
+        ) {
           value = getValues()[`${member.uuid}`];
-        } else if (member.datatype.display === 'Coded') {
+        } else if (member.datatype.display === "Coded") {
           value = {
             uuid: getValues()[`${member.uuid}`],
           };
         }
-        const groupMember = {
-          concept: { uuid: member.uuid },
-          value: value,
-          status: 'FINAL',
-          order: { uuid: order.uuid },
-        };
-        groupMembers.push(groupMember);
+
+        // Only include group members that have actual values
+        if (hasValue(value)) {
+          const groupMember = {
+            concept: { uuid: member.uuid },
+            value: value,
+            status: "FINAL",
+            order: { uuid: order.uuid },
+          };
+          groupMembers.push(groupMember);
+        }
       });
 
-      obsValue.push({
-        concept: { uuid: order.concept.uuid },
-        status: 'FINAL',
-        order: { uuid: order.uuid },
-        groupMembers: groupMembers,
-      });
+      // Only add the panel if at least one set member has a result
+      if (groupMembers.length > 0) {
+        obsValue.push({
+          concept: { uuid: order.concept.uuid },
+          status: "FINAL",
+          order: { uuid: order.uuid },
+          groupMembers: groupMembers,
+        });
+      }
     } else if (!concept.set && concept.setMembers.length === 0) {
+      // Handle individual tests - only include if value exists
       let value;
-      if (concept.datatype.display === 'Numeric' || concept.datatype.display === 'Text') {
+      if (
+        concept.datatype.display === "Numeric" ||
+        concept.datatype.display === "Text"
+      ) {
         value = getValues()[`${concept.uuid}`];
-      } else if (concept.datatype.display === 'Coded') {
+      } else if (concept.datatype.display === "Coded") {
         value = {
           uuid: getValues()[`${concept.uuid}`],
         };
       }
 
-      obsValue.push({
-        concept: { uuid: order.concept.uuid },
-        status: 'FINAL',
-        order: { uuid: order.uuid },
-        value: value,
+      // Only add the observation if it has a value
+      if (hasValue(value)) {
+        obsValue.push({
+          concept: { uuid: order.concept.uuid },
+          status: "FINAL",
+          order: { uuid: order.uuid },
+          value: value,
+        });
+      }
+    }
+
+    // Validate that at least one result exists before saving
+    if (obsValue.length === 0) {
+      showNotification({
+        title: t("noResults", "No Results to Save"),
+        kind: "error",
+        critical: false,
+        description: t(
+          "noResultsError",
+          "Please provide at least one test result before saving."
+        ),
       });
+      return;
     }
 
     const obsPayload = {
@@ -100,8 +156,8 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
 
     const orderDiscontinuationPayload = {
       previousOrder: order.uuid,
-      type: 'testorder',
-      action: 'DISCONTINUE',
+      type: "testorder",
+      action: "DISCONTINUE" as const,
       careSetting: order.careSetting.uuid,
       encounter: order.encounter.uuid,
       patient: order.patient.uuid,
@@ -109,26 +165,50 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
       orderer: order.orderer.uuid,
     };
 
-    UpdateOrderResult(order.encounter.uuid, obsPayload, orderDiscontinuationPayload).then(
-      () => {
-        showSnackbar({
-          isLowContrast: true,
-          title: t('updateEncounter', 'Update lab results'),
-          kind: 'success',
-          subtitle: t('generateSuccessfully', 'You have successfully updated test results'),
-        });
-        closeOverlay();
-        handleMutate(`${restBaseUrl}/order`);
-        handleMutate(`${restBaseUrl}/referredorders`);
+    UpdateOrderResult(
+      order.encounter.uuid,
+      obsPayload,
+      orderDiscontinuationPayload
+    ).then(
+      (result) => {
+        if (result.success) {
+          showSnackbar({
+            isLowContrast: true,
+            title: t("updateEncounter", "Update lab results"),
+            kind: "success",
+            subtitle: t(
+              "generateSuccessfully",
+              "You have successfully updated test results"
+            ),
+          });
+          closeOverlay();
+        } else {
+          // Handle transaction failure
+          const errorMessage = result.error || t("unexpectedError", "An unexpected error occurred");
+
+          showNotification({
+            title: t(
+              "errorUpdatingEncounter",
+              "Error occurred while updating test results"
+            ),
+            kind: "error",
+            critical: true,
+            description: errorMessage,
+          });
+        }
       },
       (err) => {
+        // Handle unexpected errors
         showNotification({
-          title: t(`errorUpdatingEncounter', 'Error occurred while updating test results`),
-          kind: 'error',
+          title: t(
+            "errorUpdatingEncounter",
+            "Error occurred while updating test results"
+          ),
+          kind: "error",
           critical: true,
-          description: err?.message,
+          description: err?.message || t("unexpectedError", "An unexpected error occurred"),
         });
-      },
+      }
     );
   };
   return (
@@ -143,21 +223,32 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
               status="active"
             />
           )}
-          {patient && <ExtensionSlot name="patient-header-slot" state={bannerState} />}
+          {patient && (
+            <ExtensionSlot name="patient-header-slot" state={bannerState} />
+          )}
           {/* // we need to display test name for test panels */}
           {concept.setMembers.length > 0 && <div>{concept.display}</div>}
           {concept && (
             <section className={styles.section}>
               <form>
-                <ResultFormField register={register} concept={concept} control={control} errors={errors} />
+                <ResultFormField
+                  register={register}
+                  concept={concept}
+                  control={control}
+                  errors={errors}
+                />
               </form>
             </section>
           )}
         </ModalBody>
 
         <ModalFooter>
-          <Button disabled={isSubmitting} onClick={() => closeOverlay()} kind="secondary">
-            {t('cancel', 'Cancel')}
+          <Button
+            disabled={isSubmitting}
+            onClick={() => closeOverlay()}
+            kind="secondary"
+          >
+            {t("cancel", "Cancel")}
           </Button>
           <Button onClick={handleSubmit(onSubmit)}>Save test results</Button>
         </ModalFooter>

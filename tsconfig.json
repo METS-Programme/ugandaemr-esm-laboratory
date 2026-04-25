@@ -20,6 +20,12 @@
     ],
     "resolveJsonModule": true,
     "noEmit": true,
-    "target": "esnext"
-  }
+    "target": "esnext",
+    "skipDefaultLibCheck": true
+  },
+  "exclude": [
+    "node_modules/@openmrs/esm-framework/node_modules/@openmrs/esm-styleguide",
+    "node_modules/@openmrs/esm-framework/node_modules/@openmrs/esm-translations",
+    "node_modules/@openmrs/esm-globals"
+  ]
 }

@@ -1,4 +1,53 @@
-import { Concept } from '../work-list/work-list.resource';
+import { Concept } from "../work-list/work-list.resource";
+
+/**
+ * Queue entry status enumeration
+ * Defines the possible states of a patient in a queue
+ */
+export enum QueueEntryStatus {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  EXPIRED = "EXPIRED",
+  SKIPPED = "SKIPPED",
+}
+
+/**
+ * Queue priority enumeration
+ * Defines the urgency levels for queue entries
+ */
+export enum QueuePriority {
+  URGENT = 1,
+  HIGH = 2,
+  NORMAL = 3,
+  LOW = 4,
+}
+
+/**
+ * Detailed encounter interface with proper typing
+ */
+export interface DetailedEncounter {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
+  patient: {
+    uuid: string;
+    display: string;
+  };
+  location: {
+    uuid: string;
+    display: string;
+  };
+  form?: {
+    uuid: string;
+    display: string;
+  };
+}
 
 export interface PatientQueue {
   uuid: string;
@@ -52,9 +101,8 @@ export interface PatientQueue {
   };
   locationFrom: QueueLocation;
   locationTo: QueueLocation;
-  // encounter: string; // TODO add encounter type
-  status: string; // TODO add status enum
-  priority: number; // TODO add priority enum
+  status: QueueEntryStatus;
+  priority: QueuePriority;
   priorityComment: string;
   visitNumber: string;
   comment: string;

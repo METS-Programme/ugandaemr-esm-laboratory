@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { type AssignedExtension, Extension, useConnectedExtensions } from '@openmrs/esm-framework';
-import { Tab, Tabs, TabList, TabPanels, TabPanel, Search } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import styles from './laboratory-queue.scss';
-import TestsOrderedList from './tests-ordered-list.component';
-import { ComponentContext } from '@openmrs/esm-framework/src/internal';
+import React, { useState } from "react";
+import {
+  type AssignedExtension,
+  Extension,
+  useConnectedExtensions,
+} from "@openmrs/esm-framework";
+import { Tab, Tabs, TabList, TabPanels, TabPanel, Search } from "@carbon/react";
+import { useTranslation } from "react-i18next";
+import styles from "./laboratory-queue.scss";
+import TestsOrderedList from "./tests-ordered-list.component";
+import { ComponentContext } from "@openmrs/esm-framework/src/internal";
 
 enum TabTypes {
   STARRED,
@@ -13,12 +17,14 @@ enum TabTypes {
   ALL,
 }
 
-const labPanelSlot = 'lab-panels-slot';
+const labPanelSlot = "lab-panels-slot";
 
 const LaboratoryOrdersTabs: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
-  const tabExtensions = useConnectedExtensions(labPanelSlot) as AssignedExtension[];
+  const tabExtensions = useConnectedExtensions(
+    labPanelSlot
+  ) as AssignedExtension[];
 
   return (
     <main className={`omrs-main-content`}>
@@ -26,9 +32,16 @@ const LaboratoryOrdersTabs: React.FC = () => {
         <Tabs
           selectedIndex={selectedTab}
           onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
-          className={styles.tabs}>
-          <TabList style={{ paddingLeft: '1rem' }} aria-label="Laboratory tabs" contained>
-            <Tab style={{ width: '150px' }}>{t('testedOrders', 'Tests ordered')}</Tab>
+          className={styles.tabs}
+        >
+          <TabList
+            style={{ paddingLeft: "1rem" }}
+            aria-label="Laboratory tabs"
+            contained
+          >
+            <Tab style={{ width: "150px" }}>
+              {t("testedOrders", "Tests ordered")}
+            </Tab>
             {tabExtensions
               .filter((extension) => Object.keys(extension.meta).length > 0)
               .map((extension, index) => {
@@ -36,7 +49,12 @@ const LaboratoryOrdersTabs: React.FC = () => {
 
                 if (name && title) {
                   return (
-                    <Tab key={index} className={styles.tab} id={`${title || index}-tab`} style={{ width: '150px' }}>
+                    <Tab
+                      key={index}
+                      className={styles.tab}
+                      id={`${title || index}-tab`}
+                      style={{ width: "150px" }}
+                    >
                       {t(title, {
                         ns: extension.moduleName,
                         defaultValue: title,
@@ -60,14 +78,15 @@ const LaboratoryOrdersTabs: React.FC = () => {
                     <ComponentContext.Provider
                       key={extension.id}
                       value={{
-                        featureName: 'LabPanel',
+                        featureName: "LabPanel",
                         moduleName: extension.moduleName,
                         extension: {
                           extensionId: extension.id,
                           extensionSlotName: labPanelSlot,
                           extensionSlotModuleName: extension.moduleName,
                         },
-                      }}>
+                      }}
+                    >
                       <Extension />
                     </ComponentContext.Provider>
                   </TabPanel>

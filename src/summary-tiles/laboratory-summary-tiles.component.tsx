@@ -1,15 +1,21 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './laboratory-summary-tiles.scss';
-import { AssignedExtension, useConnectedExtensions, Extension } from '@openmrs/esm-framework';
-import { ComponentContext } from '@openmrs/esm-framework/src/internal';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import styles from "./laboratory-summary-tiles.scss";
+import {
+  AssignedExtension,
+  useConnectedExtensions,
+  Extension,
+} from "@openmrs/esm-framework";
+import { ComponentContext } from "@openmrs/esm-framework/src/internal";
 
 const LaboratorySummaryTiles: React.FC = () => {
   const { t } = useTranslation();
 
-  const labTileSlot = 'lab-tiles-slot';
+  const labTileSlot = "lab-tiles-slot";
 
-  const tilesExtensions = useConnectedExtensions(labTileSlot) as AssignedExtension[];
+  const tilesExtensions = useConnectedExtensions(
+    labTileSlot
+  ) as AssignedExtension[];
 
   return (
     <div className={styles.cardContainer}>
@@ -20,14 +26,15 @@ const LaboratorySummaryTiles: React.FC = () => {
             <ComponentContext.Provider
               key={extension.id}
               value={{
-                featureName: 'LabTiles',
+                featureName: "LabTiles",
                 moduleName: extension.moduleName,
                 extension: {
                   extensionId: extension.id,
                   extensionSlotName: labTileSlot,
                   extensionSlotModuleName: extension.moduleName,
                 },
-              }}>
+              }}
+            >
               <Extension />
             </ComponentContext.Provider>
           );

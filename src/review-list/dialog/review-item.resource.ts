@@ -1,12 +1,18 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from "@openmrs/esm-framework";
 
-export async function ApproverOrder(body: any) {
+export interface OrderApprovalPayload {
+  orderIds: string[];
+  comments?: string;
+  approvedBy: string;
+}
+
+export async function ApproverOrder(body: OrderApprovalPayload) {
   const abortController = new AbortController();
 
   return openmrsFetch(`${restBaseUrl}/approveorder`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     signal: abortController.signal,
     body: body,
