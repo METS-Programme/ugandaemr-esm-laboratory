@@ -5,8 +5,7 @@
 
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useApiCall, useGetApi, usePostApi } from "../use-api-call";
-import { openmrsFetch } from "@openmrs/esm-framework";
-import { showNotification } from "@openmrs/esm-framework";
+import { openmrsFetch, showNotification } from "@openmrs/esm-framework";
 
 // Mock the OpenMRS dependencies
 jest.mock("@openmrs/esm-framework", () => ({

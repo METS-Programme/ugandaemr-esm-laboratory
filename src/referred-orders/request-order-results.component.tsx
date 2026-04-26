@@ -44,7 +44,8 @@ const RequestResultsAction: React.FC<RequestResultsActionProps> = ({
         });
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       showSnackbar({
         title: "Request ViralLoad",
         subtitle: `Request failed: ${errorMessage}`,

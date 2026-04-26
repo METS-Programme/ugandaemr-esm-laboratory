@@ -42,7 +42,9 @@ describe("StatusBadge Component", () => {
     });
 
     it("should apply correct styling classes", () => {
-      const { container } = renderWithI18n(<StatusBadge status="IN_PROGRESS" size="sm" />);
+      const { container } = renderWithI18n(
+        <StatusBadge status="IN_PROGRESS" size="sm" />
+      );
       const badge = container.querySelector(".status-badge");
       expect(badge).toHaveClass("status-badge--sm");
     });
@@ -56,7 +58,9 @@ describe("StatusBadge Component", () => {
     });
 
     it("should apply orange color for IN_PROGRESS status", () => {
-      const { container } = renderWithI18n(<StatusBadge status="IN_PROGRESS" />);
+      const { container } = renderWithI18n(
+        <StatusBadge status="IN_PROGRESS" />
+      );
       const badge = container.querySelector(".status-badge");
       expect(badge).toHaveStyle({ backgroundColor: "#FF9800" });
     });
@@ -76,19 +80,25 @@ describe("StatusBadge Component", () => {
 
   describe("size variations", () => {
     it("should render small badge with size='sm'", () => {
-      const { container } = renderWithI18n(<StatusBadge status="COMPLETED" size="sm" />);
+      const { container } = renderWithI18n(
+        <StatusBadge status="COMPLETED" size="sm" />
+      );
       const badge = container.querySelector(".status-badge");
       expect(badge).toHaveClass("status-badge--sm");
     });
 
     it("should render medium badge with size='md'", () => {
-      const { container } = renderWithI18n(<StatusBadge status="COMPLETED" size="md" />);
+      const { container } = renderWithI18n(
+        <StatusBadge status="COMPLETED" size="md" />
+      );
       const badge = container.querySelector(".status-badge");
       expect(badge).toHaveClass("status-badge--md");
     });
 
     it("should render large badge with size='lg'", () => {
-      const { container } = renderWithI18n(<StatusBadge status="COMPLETED" size="lg" />);
+      const { container } = renderWithI18n(
+        <StatusBadge status="COMPLETED" size="lg" />
+      );
       const badge = container.querySelector(".status-badge");
       expect(badge).toHaveClass("status-badge--lg");
     });
@@ -96,13 +106,17 @@ describe("StatusBadge Component", () => {
 
   describe("translations", () => {
     it("should use translation key when provided", () => {
-      renderWithI18n(<StatusBadge status="COMPLETED" translationKey="orderStatus" />);
+      renderWithI18n(
+        <StatusBadge status="COMPLETED" translationKey="orderStatus" />
+      );
       // Assuming translations are set up, this would use the translated version
       expect(screen.getByText(/completed/i)).toBeInTheDocument();
     });
 
     it("should fallback to status text when translation not found", () => {
-      renderWithI18n(<StatusBadge status="RANDOM_STATUS" translationKey="customKey" />);
+      renderWithI18n(
+        <StatusBadge status="RANDOM_STATUS" translationKey="customKey" />
+      );
       expect(screen.getByText("RANDOM_STATUS")).toBeInTheDocument();
     });
   });

@@ -93,7 +93,7 @@ export function usePagination(options: PaginationOptions = {}) {
 
   // Get paginated data from array
   const getPaginatedData = useCallback(
-    <T,>(data: T[]): T[] => {
+    <T>(data: T[]): T[] => {
       if (!data || data.length === 0) return [];
       return data.slice(startIndex, endIndex);
     },
@@ -111,7 +111,15 @@ export function usePagination(options: PaginationOptions = {}) {
       hasNextPage,
       hasPreviousPage,
     }),
-    [currentPage, currentPageSize, endIndex, hasNextPage, hasPreviousPage, startIndex, totalPages]
+    [
+      currentPage,
+      currentPageSize,
+      endIndex,
+      hasNextPage,
+      hasPreviousPage,
+      startIndex,
+      totalPages,
+    ]
   );
 
   // Pagination actions object
@@ -123,7 +131,15 @@ export function usePagination(options: PaginationOptions = {}) {
       setPageSize,
       resetPagination,
     }),
-    [goToPage, hasNextPage, hasPreviousPage, nextPage, previousPage, resetPagination, setPageSize]
+    [
+      goToPage,
+      hasNextPage,
+      hasPreviousPage,
+      nextPage,
+      previousPage,
+      resetPagination,
+      setPageSize,
+    ]
   );
 
   return {
@@ -140,7 +156,7 @@ export function usePagination(options: PaginationOptions = {}) {
  */
 export function useArrayPagination<T>(
   data: T[] = [],
-  options: Omit<PaginationOptions, 'totalItems'> = {}
+  options: Omit<PaginationOptions, "totalItems"> = {}
 ) {
   const totalItems = data.length;
   const pagination = usePagination({ ...options, totalItems });

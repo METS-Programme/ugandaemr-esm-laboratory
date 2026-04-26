@@ -47,6 +47,7 @@ export const logger = {
    */
   debug: (message: string, ...args: unknown[]) => {
     if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console
       console.log(`[DEBUG] ${message}`, ...args);
     }
   },
@@ -79,7 +80,12 @@ export const logger = {
    * Structured logging with context
    * Provides consistent log format for monitoring and analysis
    */
-  logWithContext: (level: LogLevel, message: string, context?: string, data?: unknown) => {
+  logWithContext: (
+    level: LogLevel,
+    message: string,
+    context?: string,
+    data?: unknown
+  ) => {
     const logEntry: LogEntry = {
       level,
       message,
@@ -91,6 +97,7 @@ export const logger = {
     switch (level) {
       case LogLevel.DEBUG:
         if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
           console.log(JSON.stringify(logEntry, null, 2));
         }
         break;
@@ -128,10 +135,14 @@ export class PerformanceLogger {
 
     if (thresholdMs && duration > thresholdMs) {
       logger.warn(
-        `Slow operation detected: ${this.operationName} took ${duration.toFixed(2)}ms (threshold: ${thresholdMs}ms)`
+        `Slow operation detected: ${this.operationName} took ${duration.toFixed(
+          2
+        )}ms (threshold: ${thresholdMs}ms)`
       );
     } else {
-      logger.debug(`${this.operationName} completed in ${duration.toFixed(2)}ms`);
+      logger.debug(
+        `${this.operationName} completed in ${duration.toFixed(2)}ms`
+      );
     }
   }
 
@@ -167,7 +178,11 @@ export function useComponentLogging(componentName: string) {
  * Error tracking for production (placeholder for future integration)
  * This would integrate with services like Sentry, LogRocket, etc.
  */
-export function trackError(error: Error, context?: string, additionalInfo?: Record<string, unknown>) {
+export function trackError(
+  error: Error,
+  context?: string,
+  additionalInfo?: Record<string, unknown>
+) {
   const errorInfo = {
     message: error.message,
     stack: error.stack,

@@ -3,7 +3,11 @@
  * Provides reusable validation functions for laboratory test results
  */
 
-import { FormValue, LaboratoryConcept, ValidationResult } from "../types/laboratory.types";
+import {
+  FormValue,
+  LaboratoryConcept,
+  ValidationResult,
+} from "../types/laboratory.types";
 
 /**
  * Checks if a value is not empty or invalid
@@ -93,7 +97,8 @@ export function validateResults(
 
     if (filledMembers.length === 0) {
       errors.push(
-        t ? t("panelMustHaveResult", "Panel must have at least one result")
+        t
+          ? t("panelMustHaveResult", "Panel must have at least one result")
           : "Panel must have at least one result"
       );
     }
@@ -102,7 +107,8 @@ export function validateResults(
     const value = formValues[concept.uuid];
     if (!hasValue(value)) {
       errors.push(
-        t ? t("testMustHaveValue", "Test must have a value to save")
+        t
+          ? t("testMustHaveValue", "Test must have a value to save")
           : "Test must have a value to save"
       );
     }
@@ -141,21 +147,21 @@ export function validateObservationPayload(
   try {
     // Basic structural validation
     if (!obsPayload?.obs || !Array.isArray(obsPayload.obs)) {
-      return { valid: false, error: 'Invalid observation payload structure' };
+      return { valid: false, error: "Invalid observation payload structure" };
     }
 
     // Check that at least one observation exists
     if (obsPayload.obs.length === 0) {
-      return { valid: false, error: 'No observations to save' };
+      return { valid: false, error: "No observations to save" };
     }
 
     // Validate each observation has required fields
     for (const obs of obsPayload.obs) {
       if (!obs.concept?.uuid) {
-        return { valid: false, error: 'Observation missing concept UUID' };
+        return { valid: false, error: "Observation missing concept UUID" };
       }
       if (!obs.status) {
-        return { valid: false, error: 'Observation missing status' };
+        return { valid: false, error: "Observation missing status" };
       }
     }
 
@@ -163,7 +169,7 @@ export function validateObservationPayload(
   } catch (error) {
     return {
       valid: false,
-      error: `Validation error: ${error.message}`
+      error: `Validation error: ${error.message}`,
     };
   }
 }

@@ -38,27 +38,32 @@ export function initializeMonitoring(config: {
   // Initialize error tracking if Sentry DSN provided
   if (config.sentry && typeof window !== "undefined") {
     // Dynamic import to avoid bundling Sentry if not needed
-    import("./error-tracking").then(({ initializeErrorTracking }) => {
-      initializeErrorTracking({
-        dsn: config.sentry.dsn,
-        env: config.sentry.environment,
-        release: config.sentry.release,
+    import("./error-tracking")
+      .then(({ initializeErrorTracking }) => {
+        initializeErrorTracking({
+          dsn: config.sentry.dsn,
+          env: config.sentry.environment,
+          release: config.sentry.release,
+        });
+      })
+      .catch((error) => {
+        console.warn("Failed to initialize error tracking:", error);
       });
-    }).catch((error) => {
-      console.warn("Failed to initialize error tracking:", error);
-    });
   }
 
   // Initialize performance monitoring
   if (config.performance?.enabled !== false && typeof window !== "undefined") {
     // Dynamic import to avoid issues
-    import("./performance-monitoring").then(({ setupWebVitalsMonitoring }) => {
-      setupWebVitalsMonitoring();
-    }).catch((error) => {
-      console.warn("Failed to initialize performance monitoring:", error);
-    });
+    import("./performance-monitoring")
+      .then(({ setupWebVitalsMonitoring }) => {
+        setupWebVitalsMonitoring();
+      })
+      .catch((error) => {
+        console.warn("Failed to initialize performance monitoring:", error);
+      });
   }
 
+  // eslint-disable-next-line no-console
   console.log("Monitoring system initialized", {
     errorTracking: !!config.sentry,
     performanceMonitoring: config.performance?.enabled !== false,

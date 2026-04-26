@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl } from "@openmrs/esm-framework";
 import useSWR from "swr";
 import { validateObservationPayload as validateObs } from "./result-form-validation.utils";
+import { logger } from "../utils/logger";
 import {
   ObservationListPayload,
   OrderDiscontinuationPayload,
@@ -365,10 +366,14 @@ export interface TransactionResult {
  * Rolls back a discontinued order by voiding it
  * This is used when observation save fails after order discontinuation
  */
-async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: boolean; error?: string }> {
+async function rollbackDiscontinuedOrder(
+  orderUuid: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     // Check if this is actually a discontinued order
-    const orderResponse = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}`);
+    const orderResponse = await openmrsFetch(
+      `${restBaseUrl}/order/${orderUuid}`
+    );
 
     if (orderResponse.ok) {
       const orderData = await orderResponse.json();
@@ -376,8 +381,8 @@ async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: 
       if (orderData.stopped || orderData.dateStopped) {
         // Void the discontinuation action
         await openmrsFetch(`${restBaseUrl}/order/${orderUuid}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
         });
         return { success: true };
       }
@@ -385,10 +390,10 @@ async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: 
 
     return { success: true }; // Order wasn't discontinued, no rollback needed
   } catch (error) {
-    console.error('Failed to rollback order:', error);
+    logger.error("Failed to rollback order:", error);
     return {
       success: false,
-      error: `Rollback failed: ${error.message}`
+      error: `Rollback failed: ${error.message}`,
     };
   }
 }
@@ -411,13 +416,15 @@ export async function UpdateOrderResult(
 
   try {
     // Step 1: Validate observation payload first
-    const validation = await validateObs(obsPayload as unknown as Record<string, unknown>);
+    const validation = await validateObs(
+      obsPayload as unknown as Record<string, unknown>
+    );
     if (!validation.valid) {
       return {
         success: false,
         error: validation.error,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -437,20 +444,20 @@ export async function UpdateOrderResult(
         success: false,
         error: `Order update failed: ${orderError.message}`,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
     if (orderUpdateResponse.status !== 201) {
       // Order update failed - no need to rollback since nothing changed
       const errorData = orderUpdateResponse.data?.error || {};
-      const errorMessage = errorData.message || 'Order update failed';
+      const errorMessage = errorData.message || "Order update failed";
 
       return {
         success: false,
         error: `Order update failed: ${errorMessage}`,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -460,37 +467,48 @@ export async function UpdateOrderResult(
     // Step 3: Save the observations
     let obsResponse;
     try {
-      obsResponse = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: abortController.signal,
-        body: obsPayload,
-      });
+      obsResponse = await openmrsFetch(
+        `${restBaseUrl}/encounter/${encounterUuid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          signal: abortController.signal,
+          body: obsPayload,
+        }
+      );
     } catch (obsError) {
       // Observation save failed - rollback the order
       const rollback = await rollbackDiscontinuedOrder(previousOrderUuid);
 
       return {
         success: false,
-        error: `Observation save failed: ${obsError.message}. ${rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'}`,
+        error: `Observation save failed: ${obsError.message}. ${
+          rollback.success
+            ? "Order has been rolled back."
+            : "Order rollback failed - manual intervention required."
+        }`,
         orderUpdated: true,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
     if (!obsResponse.ok) {
       // Observation save returned error status - rollback the order
       const errorData = obsResponse.data?.error || {};
-      const errorMessage = errorData.message || 'Observation save failed';
+      const errorMessage = errorData.message || "Observation save failed";
       const rollback = await rollbackDiscontinuedOrder(previousOrderUuid);
 
       return {
         success: false,
-        error: `Observation save failed: ${errorMessage}. ${rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'}`,
+        error: `Observation save failed: ${errorMessage}. ${
+          rollback.success
+            ? "Order has been rolled back."
+            : "Order rollback failed - manual intervention required."
+        }`,
         orderUpdated: true,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -498,17 +516,16 @@ export async function UpdateOrderResult(
     return {
       success: true,
       orderUpdated: true,
-      observationSaved: true
+      observationSaved: true,
     };
-
   } catch (error) {
     // Unexpected error
-    console.error('Unexpected error in UpdateOrderResult:', error);
+    logger.error("Unexpected error in UpdateOrderResult:", error);
     return {
       success: false,
       error: `Unexpected error: ${error.message}`,
       orderUpdated: false,
-      observationSaved: false
+      observationSaved: false,
     };
   }
 }

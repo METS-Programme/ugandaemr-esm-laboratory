@@ -5,7 +5,11 @@
 
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { openmrsFetch, restBaseUrl, showNotification } from "@openmrs/esm-framework";
+import {
+  openmrsFetch,
+  restBaseUrl,
+  showNotification,
+} from "@openmrs/esm-framework";
 import { ApiResult } from "../types/api/responses";
 
 export interface UseApiCallOptions {
@@ -76,7 +80,10 @@ export function useApiCall<T>(options: UseApiCallOptions = {}) {
           };
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : t("unexpectedError", "An unexpected error occurred");
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : t("unexpectedError", "An unexpected error occurred");
         const errors = [errorMessage];
         setError(errors);
 
@@ -145,15 +152,18 @@ export function useGetApi<T>(url: string, options?: UseApiCallOptions) {
 export function usePostApi<T>(url: string, options?: UseApiCallOptions) {
   const { execute, isLoading, data, error, reset } = useApiCall<T>(options);
 
-  const postData = useCallback(async (payload: unknown) => {
-    return execute(() =>
-      openmrsFetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-      })
-    );
-  }, [url, execute]);
+  const postData = useCallback(
+    async (payload: unknown) => {
+      return execute(() =>
+        openmrsFetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        })
+      );
+    },
+    [url, execute]
+  );
 
   return {
     isLoading,

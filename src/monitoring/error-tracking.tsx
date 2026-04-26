@@ -16,7 +16,10 @@ export interface SentryConfig {
   env: string;
   release?: string;
   tracesSampleRate?: number;
-  beforeSend?: (event: Sentry.Event, hint: Sentry.EventHint) => Sentry.Event | null | PromiseLike<Sentry.Event | null>;
+  beforeSend?: (
+    event: Sentry.Event,
+    hint: Sentry.EventHint
+  ) => Sentry.Event | null | PromiseLike<Sentry.Event | null>;
 }
 
 /**
@@ -36,7 +39,10 @@ export interface UserContext {
  */
 export function initializeErrorTracking(config: SentryConfig): void {
   if (!config.dsn || config.env === "development") {
-    loggerTrackError(new Error("Sentry not initialized - DSN missing or development mode"), "initialization");
+    loggerTrackError(
+      new Error("Sentry not initialized - DSN missing or development mode"),
+      "initialization"
+    );
     return;
   }
 
@@ -44,9 +50,7 @@ export function initializeErrorTracking(config: SentryConfig): void {
     dsn: config.dsn,
     environment: config.env || "production",
     release: config.release || "laboratory-esm@1.0.0",
-    integrations: [
-      browserTracingIntegration(),
-    ],
+    integrations: [browserTracingIntegration()],
     tracesSampleRate: config.tracesSampleRate || 0.1, // 10% of transactions sampled
 
     // Filter sensitive data
@@ -60,7 +64,10 @@ export function initializeErrorTracking(config: SentryConfig): void {
       // Filter out specific error types
       if (event.exception) {
         const errorValue = event.exception.values?.[0]?.value;
-        if (errorValue?.includes("ChunkLoadError") || errorValue?.includes("Loading CSS")) {
+        if (
+          errorValue?.includes("ChunkLoadError") ||
+          errorValue?.includes("Loading CSS")
+        ) {
           // Don't send resource loading errors to Sentry
           return null;
         }
@@ -80,14 +87,17 @@ export function initializeErrorTracking(config: SentryConfig): void {
       if (breadcrumb.category === "xhr" || breadcrumb.category === "fetch") {
         if (breadcrumb.data?.url) {
           // Remove query parameters and sensitive paths
-          breadcrumb.data.url = breadcrumb.data.url.replace(/[?&]([^=]+)=([^&]*)/g, (match, key, value) => {
-            // Keep non-sensitive parameters
-            const safeKeys = ["page", "limit", "sort"];
-            if (safeKeys.includes(key)) {
-              return match;
+          breadcrumb.data.url = breadcrumb.data.url.replace(
+            /[?&]([^=]+)=([^&]*)/g,
+            (match, key, value) => {
+              // Keep non-sensitive parameters
+              const safeKeys = ["page", "limit", "sort"];
+              if (safeKeys.includes(key)) {
+                return match;
+              }
+              return `${key}=REDACTED`;
             }
-            return `${key}=REDACTED`;
-          });
+          );
         }
       }
 
@@ -188,7 +198,10 @@ export function trackPerformanceIssue(
  * Create a performance tracking wrapper
  * Automatically tracks operation duration
  */
-export function createPerformanceTracker(operationName: string, thresholdMs?: number) {
+export function createPerformanceTracker(
+  operationName: string,
+  thresholdMs?: number
+) {
   const startTime = performance.now();
 
   return {
@@ -257,7 +270,9 @@ export class SentryErrorBoundary extends Component<
           <div className="error-fallback">
             <h2>Something went wrong.</h2>
             <p>The error has been logged and we'll look into it.</p>
-            <button onClick={() => window.location.reload()}>Reload Page</button>
+            <button onClick={() => window.location.reload()}>
+              Reload Page
+            </button>
           </div>
         )
       );

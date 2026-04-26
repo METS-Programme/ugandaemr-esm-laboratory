@@ -91,7 +91,9 @@ describe("Result Validation Tests", () => {
 
       const result = validateResults(panelConcept, formValues);
       expect(result.isValid).toBe(false);
-      expect(result.errors.some((e) => e.includes("critically high"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("critically high"))).toBe(
+        true
+      );
     });
 
     it("should reject non-numeric values for numeric tests", () => {
@@ -173,7 +175,9 @@ describe("Result Validation Tests", () => {
 
       const result = validateResults(singleConcept, formValues);
       expect(result.isValid).toBe(false);
-      expect(result.errors.some((e) => e.includes("critically low"))).toBe(true);
+      expect(result.errors.some((e) => e.includes("critically low"))).toBe(
+        true
+      );
     });
 
     it("should accept value within valid range", () => {

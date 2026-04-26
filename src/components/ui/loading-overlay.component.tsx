@@ -36,8 +36,14 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 
   if (type === "fullscreen") {
     return (
-      <div className={`loading-overlay loading-overlay--fullscreen ${styles.fullscreen}`}>
-        <Loading active={true} withOverlay={true} description={loadingMessage} />
+      <div
+        className={`loading-overlay loading-overlay--fullscreen ${styles.fullscreen}`}
+      >
+        <Loading
+          active={true}
+          withOverlay={true}
+          description={loadingMessage}
+        />
         <p className={styles.description}>{loadingDescription}</p>
       </div>
     );
@@ -45,11 +51,15 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 
   if (type === "overlay") {
     return (
-      <div className={`loading-overlay loading-overlay--overlay ${styles.overlay}`}>
+      <div
+        className={`loading-overlay loading-overlay--overlay ${styles.overlay}`}
+      >
         <div className={styles.content}>
           <Loading active={true} small={size === "sm"} withOverlay={false} />
           <p className={styles.message}>{loadingMessage}</p>
-          {description && <p className={styles.description}>{loadingDescription}</p>}
+          {description && (
+            <p className={styles.description}>{loadingDescription}</p>
+          )}
         </div>
       </div>
     );
@@ -71,6 +81,8 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 /**
  * Simple loading spinner for small components
  */
-export const LoadingSpinner: React.FC<{ size?: "sm" | "md" | "lg" }> = ({ size = "md" }) => {
+export const LoadingSpinner: React.FC<{ size?: "sm" | "md" | "lg" }> = ({
+  size = "md",
+}) => {
   return <Loading active={true} small={size === "sm"} withOverlay={false} />;
 };

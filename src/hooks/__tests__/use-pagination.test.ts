@@ -117,7 +117,10 @@ describe("usePagination", () => {
 
   describe("getPaginatedData", () => {
     it("should return correct data for current page", () => {
-      const testData = Array.from({ length: 100 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
+      const testData = Array.from({ length: 100 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+      }));
 
       const { result } = renderHook(() =>
         usePagination({

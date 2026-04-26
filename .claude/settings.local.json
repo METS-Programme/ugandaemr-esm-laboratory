@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn prettier *)",
+      "Bash(yarn lint *)",
+      "Bash(yarn test *)",
+      "Bash(git add *)"
+    ]
+  }
+}

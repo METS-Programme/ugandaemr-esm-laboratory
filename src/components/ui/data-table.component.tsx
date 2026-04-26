@@ -88,7 +88,8 @@ export function CustomDataTable<T extends Record<string, any>>({
   } = useArrayPagination(filteredData, { initialPageSize: pageSize });
 
   // Get row ID for selection
-  const getRowId = (row: T): string => row.id || row.uuid || JSON.stringify(row);
+  const getRowId = (row: T): string =>
+    row.id || row.uuid || JSON.stringify(row);
 
   // Get cell value
   const getCellValue = (row: T, column: Column<T>): React.ReactNode => {
@@ -141,12 +142,7 @@ export function CustomDataTable<T extends Record<string, any>>({
   }
 
   return (
-    <DataTable
-      rows={paginatedData}
-      headers={columns}
-      isSortable
-      useZebraStyles
-    >
+    <DataTable rows={paginatedData} headers={columns} isSortable useZebraStyles>
       {({
         rows,
         headers,
@@ -177,9 +173,17 @@ export function CustomDataTable<T extends Record<string, any>>({
                 <TableRow>
                   {selectable && (
                     <TableSelectAll
-                      checked={selectedRows.length === paginatedData.length && paginatedData.length > 0}
-                      indeterminate={selectedRows.length > 0 && selectedRows.length < paginatedData.length}
-                      onSelect={(event) => handleSelectAll(event.target.checked)}
+                      checked={
+                        selectedRows.length === paginatedData.length &&
+                        paginatedData.length > 0
+                      }
+                      indeterminate={
+                        selectedRows.length > 0 &&
+                        selectedRows.length < paginatedData.length
+                      }
+                      onSelect={(event) =>
+                        handleSelectAll(event.target.checked)
+                      }
                     />
                   )}
                   {headers.map((header) => (
@@ -205,7 +209,9 @@ export function CustomDataTable<T extends Record<string, any>>({
                       {selectable && (
                         <TableSelectRow
                           checked={isSelected}
-                          onSelect={(event) => handleSelectRow(rowId, event.target.checked)}
+                          onSelect={(event) =>
+                            handleSelectRow(rowId, event.target.checked)
+                          }
                         />
                       )}
                       {row.cells.map((cell) => (

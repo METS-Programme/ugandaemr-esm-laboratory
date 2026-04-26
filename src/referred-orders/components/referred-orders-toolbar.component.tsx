@@ -13,7 +13,7 @@ import {
   Toggle,
   Layer,
 } from "@carbon/react";
-import { Search, Renew as Sync } from "@carbon/icons-react";
+import { Search, Renew as Sync } from "@carbon/react/icons";
 import styles from "../referred-orders.scss";
 
 export interface ReferredOrdersToolbarProps {

@@ -238,7 +238,11 @@ export class ApiError extends Error {
   public status?: number;
   public details?: Record<string, unknown>;
 
-  constructor(message: string, status?: number, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    status?: number,
+    details?: Record<string, unknown>
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;

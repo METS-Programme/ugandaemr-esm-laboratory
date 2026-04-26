@@ -16,7 +16,7 @@ import {
   Renew,
   Email,
   Printer,
-} from "@carbon/icons-react";
+} from "@carbon/react/icons";
 
 export interface ActionItem {
   id: string;
@@ -77,7 +77,11 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
 
   return (
     <div className={`action-menu ${className}`}>
-      <OverflowMenu flipped={direction === "top"} menuLabel={menuLabel} size={size}>
+      <OverflowMenu
+        flipped={direction === "top"}
+        menuLabel={menuLabel}
+        size={size}
+      >
         {actions.map((action) => (
           <OverflowMenuItem
             key={action.id}
@@ -95,14 +99,19 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({
       {showConfirmation && pendingAction && (
         <div className="confirmation-dialog">
           <div className="confirmation-dialog-content">
-            <p>{pendingAction.confirmationMessage || t("confirmAction", "Are you sure?")}</p>
+            <p>
+              {pendingAction.confirmationMessage ||
+                t("confirmAction", "Are you sure?")}
+            </p>
             <div className="confirmation-dialog-actions">
               <button onClick={cancelAction} className="btn btn-secondary">
                 {t("cancel", "Cancel")}
               </button>
               <button
                 onClick={confirmAction}
-                className={`btn ${pendingAction.dangerous ? "btn-danger" : "btn-primary"}`}
+                className={`btn ${
+                  pendingAction.dangerous ? "btn-danger" : "btn-primary"
+                }`}
               >
                 {t("confirm", "Confirm")}
               </button>
@@ -132,13 +141,18 @@ export const createActions = {
     onClick,
   }),
 
-  delete: (onClick: () => void, confirmationMessage?: string, label?: string): ActionItem => ({
+  delete: (
+    onClick: () => void,
+    confirmationMessage?: string,
+    label?: string
+  ): ActionItem => ({
     id: "delete",
     label: label || "Delete",
     icon: TrashCan,
     onClick,
     requireConfirmation: true,
-    confirmationMessage: confirmationMessage || "Are you sure you want to delete this item?",
+    confirmationMessage:
+      confirmationMessage || "Are you sure you want to delete this item?",
     dangerous: true,
   }),
 

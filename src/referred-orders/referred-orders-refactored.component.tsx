@@ -67,8 +67,14 @@ const ReferredOrdersListRefactored: React.FC = () => {
   const headers = useMemo(
     () => [
       { key: "patient", header: t("patient", "Patient") },
-      { key: "referringFacility", header: t("referringFacility", "Referring Facility") },
-      { key: "receivingFacility", header: t("receivingFacility", "Receiving Facility") },
+      {
+        key: "referringFacility",
+        header: t("referringFacility", "Referring Facility"),
+      },
+      {
+        key: "receivingFacility",
+        header: t("receivingFacility", "Receiving Facility"),
+      },
       { key: "orderDate", header: t("orderDate", "Order Date") },
       { key: "status", header: t("status", "Status") },
       { key: "tests", header: t("tests", "Tests") },
@@ -123,7 +129,10 @@ const ReferredOrdersListRefactored: React.FC = () => {
   }
 
   // Show empty state
-  if (!paginatedReferredOrderEntries || paginatedReferredOrderEntries.length === 0) {
+  if (
+    !paginatedReferredOrderEntries ||
+    paginatedReferredOrderEntries.length === 0
+  ) {
     return (
       <div className={styles.container}>
         <ReferredOrdersToolbar
@@ -181,18 +190,27 @@ const ReferredOrdersListRefactored: React.FC = () => {
                     <TableSelectAll
                       {...getSelectionProps()}
                       checked={selectAll}
-                      indeterminate={selectedRows.length > 0 && selectedRows.length !== rows.length}
+                      indeterminate={
+                        selectedRows.length > 0 &&
+                        selectedRows.length !== rows.length
+                      }
                       onSelect={(event) => {
                         if (event.nativeEvent.shiftKey) {
                           // Handle shift+click for range selection
                           handleRowSelection(getRowIds());
                         } else {
-                          handleRowSelection(selectedRows.length === rows.length ? [] : getRowIds());
+                          handleRowSelection(
+                            selectedRows.length === rows.length
+                              ? []
+                              : getRowIds()
+                          );
                         }
                       }}
                     />
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps(header)}>{header.header}</TableHeader>
+                      <TableHeader {...getHeaderProps(header)}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -208,13 +226,24 @@ const ReferredOrdersListRefactored: React.FC = () => {
                             onSelect={(event) => {
                               if (event.nativeEvent.shiftKey) {
                                 const currentIndex = rowIndex;
-                                const previousIndex = selectedRows.length > 0
-                                  ? Math.max(...getRowIds().filter((id) => selectedRows.includes(id)).map((id) =>
-                                    getRowIds().indexOf(id)
-                                  ))
-                                  : -1;
-                                const start = Math.min(previousIndex + 1, currentIndex);
-                                const end = Math.max(previousIndex + 1, currentIndex);
+                                const previousIndex =
+                                  selectedRows.length > 0
+                                    ? Math.max(
+                                        ...getRowIds()
+                                          .filter((id) =>
+                                            selectedRows.includes(id)
+                                          )
+                                          .map((id) => getRowIds().indexOf(id))
+                                      )
+                                    : -1;
+                                const start = Math.min(
+                                  previousIndex + 1,
+                                  currentIndex
+                                );
+                                const end = Math.max(
+                                  previousIndex + 1,
+                                  currentIndex
+                                );
                                 const newSelection = [...selectedRows];
                                 for (let i = start; i <= end; i++) {
                                   if (!newSelection.includes(getRowIds()[i])) {
@@ -277,7 +306,9 @@ const ReferredOrdersListRefactored: React.FC = () => {
 
       {selectedRows.length > 0 && (
         <div className={styles.bulkActions}>
-          <p>{selectedRows.length} {t("selected", "selected")}</p>
+          <p>
+            {selectedRows.length} {t("selected", "selected")}
+          </p>
           <button
             onClick={handleSyncSelected}
             disabled={

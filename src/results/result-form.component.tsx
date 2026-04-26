@@ -184,7 +184,9 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
           closeOverlay();
         } else {
           // Handle transaction failure
-          const errorMessage = result.error || t("unexpectedError", "An unexpected error occurred");
+          const errorMessage =
+            result.error ||
+            t("unexpectedError", "An unexpected error occurred");
 
           showNotification({
             title: t(
@@ -206,7 +208,9 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
           ),
           kind: "error",
           critical: true,
-          description: err?.message || t("unexpectedError", "An unexpected error occurred"),
+          description:
+            err?.message ||
+            t("unexpectedError", "An unexpected error occurred"),
         });
       }
     );

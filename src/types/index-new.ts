@@ -14,4 +14,10 @@ export * from "./api/requests";
 export * from "./api/responses";
 
 // Re-export existing types during migration period
-export { SearchTypes, Patient, Person, Attribute, PatientIdentifier } from "./index";
+export {
+  SearchTypes,
+  Patient,
+  Person,
+  Attribute,
+  PatientIdentifier,
+} from "./index";

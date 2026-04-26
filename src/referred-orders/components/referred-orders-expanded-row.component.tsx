@@ -32,7 +32,9 @@ export interface ReferredOrderExpandedRowProps {
 /**
  * Expanded row component showing detailed referred order information
  */
-export const ReferredOrderExpandedRow: React.FC<ReferredOrderExpandedRowProps> = ({ row }) => {
+export const ReferredOrderExpandedRow: React.FC<
+  ReferredOrderExpandedRowProps
+> = ({ row }) => {
   const { t } = useTranslation();
   const [testResults, setTestResults] = React.useState<Array<any>>([]);
   const [isLoadingResults, setIsLoadingResults] = React.useState(false);
@@ -64,19 +66,31 @@ export const ReferredOrderExpandedRow: React.FC<ReferredOrderExpandedRowProps> =
           <div className={styles.expandedSection}>
             <h4>{t("orderDetails", "Order Details")}</h4>
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>{t("referringFacility", "Referring Facility")}:</span>
-              <span className={styles.detailValue}>{row.referringFacility}</span>
+              <span className={styles.detailLabel}>
+                {t("referringFacility", "Referring Facility")}:
+              </span>
+              <span className={styles.detailValue}>
+                {row.referringFacility}
+              </span>
             </div>
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>{t("receivingFacility", "Receiving Facility")}:</span>
-              <span className={styles.detailValue}>{row.receivingFacility}</span>
+              <span className={styles.detailLabel}>
+                {t("receivingFacility", "Receiving Facility")}:
+              </span>
+              <span className={styles.detailValue}>
+                {row.receivingFacility}
+              </span>
             </div>
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>{t("orderDate", "Order Date")}:</span>
+              <span className={styles.detailLabel}>
+                {t("orderDate", "Order Date")}:
+              </span>
               <span className={styles.detailValue}>{formattedDate}</span>
             </div>
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>{t("patient", "Patient")}:</span>
+              <span className={styles.detailLabel}>
+                {t("patient", "Patient")}:
+              </span>
               <span className={styles.detailValue}>{row.patient?.display}</span>
             </div>
           </div>
@@ -100,7 +114,9 @@ export const ReferredOrderExpandedRow: React.FC<ReferredOrderExpandedRowProps> =
           <div className={styles.expandedSection}>
             <h4>{t("testResults", "Test Results")}</h4>
             {isLoadingResults ? (
-              <div className={styles.loadingText}>{t("loadingResults", "Loading results...")}</div>
+              <div className={styles.loadingText}>
+                {t("loadingResults", "Loading results...")}
+              </div>
             ) : testResults.length > 0 ? (
               <ul className={styles.resultsList}>
                 {testResults.map((result, index) => (
@@ -111,7 +127,9 @@ export const ReferredOrderExpandedRow: React.FC<ReferredOrderExpandedRowProps> =
                 ))}
               </ul>
             ) : (
-              <div className={styles.noResults}>{t("noResultsAvailable", "No results available")}</div>
+              <div className={styles.noResults}>
+                {t("noResultsAvailable", "No results available")}
+              </div>
             )}
           </div>
         </div>

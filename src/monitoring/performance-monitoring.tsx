@@ -57,7 +57,10 @@ export class PerformanceMonitor {
   /**
    * Start monitoring an operation
    */
-  startOperation(operationName: string, metadata?: Record<string, any>): () => PerformanceMetrics {
+  startOperation(
+    operationName: string,
+    metadata?: Record<string, any>
+  ): () => PerformanceMetrics {
     const startTime = performance.now();
 
     return () => {
@@ -102,7 +105,12 @@ export class PerformanceMonitor {
 
     if (threshold && metrics.duration > threshold) {
       loggerTrackPerformance(metrics.operationName);
-      console.warn(`Slow operation detected: ${metrics.operationName} took ${metrics.duration.toFixed(2)}ms (threshold: ${threshold}ms)`);
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Slow operation detected: ${
+          metrics.operationName
+        } took ${metrics.duration.toFixed(2)}ms (threshold: ${threshold}ms)`
+      );
 
       // Send to Sentry
       Sentry.captureMessage(`Slow operation: ${metrics.operationName}`, {
@@ -126,10 +134,16 @@ export class PerformanceMonitor {
     if (operationName.includes("render")) {
       return this.thresholds.renderTime;
     }
-    if (operationName.includes("interaction") || operationName.includes("click")) {
+    if (
+      operationName.includes("interaction") ||
+      operationName.includes("click")
+    ) {
       return this.thresholds.userInteraction;
     }
-    if (operationName.includes("process") || operationName.includes("transform")) {
+    if (
+      operationName.includes("process") ||
+      operationName.includes("transform")
+    ) {
       return this.thresholds.dataProcessing;
     }
     return undefined;
@@ -188,10 +202,12 @@ export class PerformanceMonitor {
     }
 
     const durations = metrics.map((m) => m.duration);
-    const avgDuration = durations.reduce((sum, d) => sum + d, 0) / durations.length;
+    const avgDuration =
+      durations.reduce((sum, d) => sum + d, 0) / durations.length;
     const minDuration = Math.min(...durations);
     const maxDuration = Math.max(...durations);
-    const successRate = metrics.filter((m) => m.success).length / metrics.length;
+    const successRate =
+      metrics.filter((m) => m.success).length / metrics.length;
 
     return {
       operationName,
@@ -298,7 +314,8 @@ export function withPerformanceMonitoring<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName?: string
 ) {
-  const displayName = componentName || WrappedComponent.name || "AnonymousComponent";
+  const displayName =
+    componentName || WrappedComponent.name || "AnonymousComponent";
 
   return (props: P) => {
     usePerformanceMonitoring(displayName);
@@ -320,6 +337,7 @@ export function setupWebVitalsMonitoring() {
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
       const lcp = entries[entries.length - 1];
+      // eslint-disable-next-line no-console
       console.log("LCP:", lcp.startTime);
 
       // Send to monitoring
@@ -327,11 +345,17 @@ export function setupWebVitalsMonitoring() {
         level: lcp.startTime > 2500 ? "warning" : "info",
         extra: {
           lcp: lcp.startTime,
-          rating: lcp.startTime > 2500 ? "poor" : lcp.startTime > 1500 ? "needs-improvement" : "good",
+          rating:
+            lcp.startTime > 2500
+              ? "poor"
+              : lcp.startTime > 1500
+              ? "needs-improvement"
+              : "good",
         },
       });
     }).observe({ entryTypes: ["largest-contentful-paint"] });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn("LCP monitoring not supported");
   }
 
@@ -340,6 +364,7 @@ export function setupWebVitalsMonitoring() {
     new PerformanceObserver((list) => {
       const entries = list.getEntries();
       entries.forEach((entry: any) => {
+        // eslint-disable-next-line no-console
         console.log("FID:", entry.processingStart - entry.startTime);
 
         // Send to monitoring
@@ -355,6 +380,7 @@ export function setupWebVitalsMonitoring() {
       });
     }).observe({ entryTypes: ["first-input"] });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn("FID monitoring not supported");
   }
 
@@ -365,6 +391,7 @@ export function setupWebVitalsMonitoring() {
       list.getEntries().forEach((entry: any) => {
         if (!entry.hadRecentInput) {
           clsValue += entry.value;
+          // eslint-disable-next-line no-console
           console.log("CLS:", clsValue);
 
           // Send to monitoring if CLS is poor
@@ -381,6 +408,7 @@ export function setupWebVitalsMonitoring() {
       });
     }).observe({ entryTypes: ["layout-shift"] });
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.warn("CLS monitoring not supported");
   }
 }

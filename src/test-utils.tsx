@@ -16,10 +16,10 @@ const i18n = i18next.createInstance({
   resources: {
     en: {
       translation: {
-        "loading": "Loading",
-        "success": "Success",
-        "error": "Error",
-        "operation": "Operation",
+        loading: "Loading",
+        success: "Success",
+        error: "Error",
+        operation: "Operation",
       },
     },
   },
@@ -45,9 +45,7 @@ export function renderWithProviders(
   const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     return (
       <BrowserRouter>
-        <I18nextProvider i18n={i18n}>
-          {children}
-        </I18nextProvider>
+        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </BrowserRouter>
     );
   };
@@ -241,7 +239,9 @@ export const customMatchers = {
       message: () =>
         pass
           ? `Expected ${received} not to be a valid status`
-          : `Expected ${received} to be a valid status (one of: ${validStatuses.join(", ")})`,
+          : `Expected ${received} to be a valid status (one of: ${validStatuses.join(
+              ", "
+            )})`,
     };
   },
 

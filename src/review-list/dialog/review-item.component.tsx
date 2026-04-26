@@ -8,7 +8,11 @@ import {
   InlineLoading,
 } from "@carbon/react";
 import { useTranslation } from "react-i18next";
-import { useSession } from "@openmrs/esm-framework";
+import {
+  useSession,
+  showNotification,
+  showSnackbar,
+} from "@openmrs/esm-framework";
 import styles from "../dialog/review-item.scss";
 import {
   GroupMember,
@@ -16,7 +20,6 @@ import {
 } from "../../patient-chart/patient-laboratory-order-results.resource";
 import { useGetConceptById } from "../../patient-chart/results-summary/results-summary.resource";
 import { ApproverOrder } from "./review-item.resource";
-import { showNotification, showSnackbar } from "@openmrs/esm-framework";
 import { Result } from "../../work-list/work-list.resource";
 import { extractErrorMessagesFromResponse } from "../../utils/functions";
 
@@ -65,7 +68,10 @@ const ReviewItem: React.FC<ReviewItemDialogProps> = ({
   const approveOrder = async (e) => {
     e.preventDefault();
 
-    ApproverOrder({ orderIds: [`${orderItem?.uuid}`], approvedBy: currentUser }).then(
+    ApproverOrder({
+      orderIds: [`${orderItem?.uuid}`],
+      approvedBy: currentUser,
+    }).then(
       () => {
         showSnackbar({
           isLowContrast: true,
