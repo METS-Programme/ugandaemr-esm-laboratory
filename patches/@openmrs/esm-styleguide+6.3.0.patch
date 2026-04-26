@@ -6,7 +6,6 @@ index 1111111..2222222 100644
      let renderProps = useRenderProps({
        ...props,
        values: {
-+        ...state,
          state,
          isFocusWithin: isFocused,
          isFocusVisible,

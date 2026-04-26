@@ -4,7 +4,22 @@
       "Bash(yarn prettier *)",
       "Bash(yarn lint *)",
       "Bash(yarn test *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(yarn typescript *)",
+      "Bash(yarn tsc *)",
+      "Bash(yarn install *)",
+      "Bash(git restore *)",
+      "Bash(yarn verify *)",
+      "Bash(git fetch *)",
+      "Bash(npx tsc *)",
+      "Bash(git push *)",
+      "Bash(yarn add *)",
+      "Bash(yarn why *)",
+      "Bash(yarn npm *)",
+      "Bash(yarn build *)",
+      "Bash(/tmp/fix-datepicker.sh *)",
+      "Bash(npx patch-package *)"
     ]
   }
 }
