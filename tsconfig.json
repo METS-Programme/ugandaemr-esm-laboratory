@@ -23,10 +23,14 @@
     "target": "esnext",
     "skipDefaultLibCheck": true
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
   "exclude": [
-    "node_modules/@openmrs/esm-framework/node_modules",
-    "node_modules/@openmrs/esm-styleguide",
-    "node_modules/@openmrs/esm-translations",
-    "node_modules/@openmrs/esm-globals"
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }
