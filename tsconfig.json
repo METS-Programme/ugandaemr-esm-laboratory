@@ -24,7 +24,6 @@
     "skipDefaultLibCheck": true
   },
   "exclude": [
-    "node_modules/@openmrs/esm-framework/node_modules",
-    "node_modules/@ohri/openmrs-esm-ohri-commons-lib/node_modules"
+    "node_modules/@openmrs/esm-framework/node_modules"
   ]
 }
