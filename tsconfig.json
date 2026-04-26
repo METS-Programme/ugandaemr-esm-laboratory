@@ -24,6 +24,9 @@
     "skipDefaultLibCheck": true
   },
   "exclude": [
-    "node_modules/@openmrs/esm-framework/node_modules"
+    "node_modules/@openmrs/esm-framework/node_modules",
+    "node_modules/@openmrs/esm-styleguide",
+    "node_modules/@openmrs/esm-translations",
+    "node_modules/@openmrs/esm-globals"
   ]
 }
