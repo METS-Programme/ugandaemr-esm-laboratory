@@ -60,6 +60,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# Claude Code settings
+.claude/
+
 # next.js build output
 .next
 
