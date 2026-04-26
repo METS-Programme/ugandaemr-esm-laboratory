@@ -63,6 +63,9 @@ typings/
 # Claude Code settings
 .claude/
 
+# Turbo build cache
+.turbo/
+
 # next.js build output
 .next
 
