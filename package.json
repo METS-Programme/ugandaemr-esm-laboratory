@@ -18,8 +18,8 @@
         "verify": "turbo lint typescript test",
         "extract-translations": "i18next 'src/**/*.component.tsx' --config ./i18next-parser.config.js",
         "coverage": "yarn test -- --coverage",
-        "prepare": "husky install && patch-package",
-        "postinstall": "patch-package"
+        "prepare": "husky install && node scripts/patch-datepicker.js",
+        "postinstall": "node scripts/patch-datepicker.js && patch-package"
     },
     "husky": {
         "hooks": {
