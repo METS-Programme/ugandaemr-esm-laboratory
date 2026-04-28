@@ -33,7 +33,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, err
         <Controller
           control={control}
           rules={{
-            required: true,
+            required: false,
           }}
           name={concept.uuid}
           render={({ field }) => (
@@ -56,7 +56,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, err
           name={concept.uuid}
           control={control}
           rules={{
-            required: true,
+            required: false,
           }}
           render={({ field }) => (
             <Select
@@ -65,7 +65,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, err
               {...field}
               type="text"
               labelText={concept?.display}
-              rules={{ required: true }}>
+              rules={{ required: false }}>
               <SelectItem text={t('option', 'Choose an Option')} value="" />
 
               {concept?.answers?.map((answer) => (
@@ -86,7 +86,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, err
                 control={control}
                 name={member.uuid}
                 rules={{
-                  required: true,
+                  required: false,
                 }}
                 render={({ field }) => (
                   <TextInput
@@ -110,7 +110,7 @@ const ResultFormField: React.FC<ResultFormFieldProps> = ({ concept, control, err
                 name={member.uuid}
                 control={control}
                 rules={{
-                  required: true,
+                  required: false,
                 }}
                 render={({ field }) => (
                   <Select
