@@ -23,16 +23,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 🧭 Show workflow context
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Run number: ${{ github.run_number }}"
+
       - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Enable Corepack
+      - name: 🧶 Enable Corepack
         run: |
           corepack enable
           corepack prepare yarn@4.9.2 --activate
+          node --version
+          yarn --version
 
       - name: 💾 Cache dependencies
         id: cache
@@ -72,6 +82,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 🧭 Confirm prerelease trigger
+        run: |
+          echo "This job should only run on push to main."
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Run number: ${{ github.run_number }}"
+
       - name: 📥 Download Artifacts
         uses: actions/download-artifact@v4
 
@@ -81,10 +100,12 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Enable Corepack
+      - name: 🧶 Enable Corepack
         run: |
           corepack enable
           corepack prepare yarn@4.9.2 --activate
+          node --version
+          yarn --version
 
       - name: 💾 Cache dependencies
         id: cache
@@ -103,30 +124,110 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: 🏷️ Version (unique prerelease)
+      - name: 🏷️ Version unique prerelease
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           BASE_VERSION=$(node -e "const semver=require('semver'); console.log(semver.inc('$CURRENT_VERSION', 'patch'))")
           NEW_VERSION="${BASE_VERSION}-pre.${{ github.run_number }}"
-          echo "Publishing version: ${NEW_VERSION}"
+
+          echo "Current version: ${CURRENT_VERSION}"
+          echo "Base patch version: ${BASE_VERSION}"
+          echo "New prerelease version: ${NEW_VERSION}"
+
           yarn version "${NEW_VERSION}"
+
+          echo "package.json version after update:"
+          node -p "require('./package.json').version"
 
       - name: 🛠️ Build
         run: yarn turbo run build --color --concurrency=5
 
+      - name: 📦 Inspect package metadata
+        run: |
+          echo "Package name:"
+          node -p "require('./package.json').name"
+
+          echo "Package version:"
+          node -p "require('./package.json').version"
+
+          echo "Package private field:"
+          node -p "require('./package.json').private"
+
+          echo "Package publishConfig:"
+          node -p "JSON.stringify(require('./package.json').publishConfig || {}, null, 2)"
+
+          echo "Package files field:"
+          node -p "JSON.stringify(require('./package.json').files || [], null, 2)"
+
       - name: ✅ Verify package contains dist JS
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "dist js files missing from tarball" && exit 1)
 
-      - name: 🚢 Publish prerelease
+          echo "Package tarball contents:"
+          tar -tf package.tgz
+
+          echo "Checking for built JS files in dist..."
+          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "❌ dist js files missing from tarball" && exit 1)
+
+          echo "✅ dist JS files found in tarball"
+
+      - name: 🔐 Diagnose npm authentication
         run: |
+          echo "Checking whether NPM_AUTH_TOKEN exists..."
+          if [ -z "${NPM_AUTH_TOKEN}" ]; then
+            echo "❌ NPM_AUTH_TOKEN is missing or empty"
+            exit 1
+          fi
+
+          echo "✅ NPM_AUTH_TOKEN is present"
+
+          echo "Setting npm auth token for Yarn..."
           yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
-          yarn npm publish --access public --tag next
+
+          echo "Checking npm identity..."
+          yarn npm whoami
+
+          echo "✅ npm authentication succeeded"
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Cleanup
+      - name: 🔎 Check npm package and duplicate version
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Package to publish: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
+
+          echo "Current npm package info:"
+          yarn npm info "${PACKAGE_NAME}" name version dist-tags --json || true
+
+          echo "Checking whether this exact version already exists..."
+          if yarn npm info "${PACKAGE_NAME}@${PACKAGE_VERSION}" version; then
+            echo "❌ Version already exists on npm: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
+            echo "npm versions are immutable. Increase the version or use a different prerelease number."
+            exit 1
+          fi
+
+          echo "✅ Version does not exist yet"
+
+      - name: 🚢 Publish prerelease to npm next tag
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Publishing ${PACKAGE_NAME}@${PACKAGE_VERSION} with npm tag: next"
+
+          yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
+          yarn npm publish --access public --tag next
+
+          echo "✅ Publish command completed"
+
+          echo "Checking npm dist-tags after publish:"
+          yarn npm info "${PACKAGE_NAME}" dist-tags --json || true
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: 🧹 Cleanup
         if: always()
         run: rm -f package.tgz
 
@@ -145,6 +246,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 🧭 Confirm release trigger
+        run: |
+          echo "This job should only run when a GitHub Release is created."
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          echo "Repository: ${{ github.repository }}"
+
       - name: 📥 Download Artifacts
         uses: actions/download-artifact@v4
 
@@ -154,10 +263,12 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Enable Corepack
+      - name: 🧶 Enable Corepack
         run: |
           corepack enable
           corepack prepare yarn@4.9.2 --activate
+          node --version
+          yarn --version
 
       - name: 💾 Cache dependencies
         id: cache
@@ -173,18 +284,91 @@ jobs:
       - name: 🛠️ Build
         run: yarn turbo run build --color
 
+      - name: 📦 Inspect package metadata
+        run: |
+          echo "Package name:"
+          node -p "require('./package.json').name"
+
+          echo "Package version:"
+          node -p "require('./package.json').version"
+
+          echo "Package private field:"
+          node -p "require('./package.json').private"
+
+          echo "Package publishConfig:"
+          node -p "JSON.stringify(require('./package.json').publishConfig || {}, null, 2)"
+
+          echo "Package files field:"
+          node -p "JSON.stringify(require('./package.json').files || [], null, 2)"
+
       - name: ✅ Verify package contains dist JS
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "dist js files missing from tarball" && exit 1)
 
-      - name: 🚢 Publish release
+          echo "Package tarball contents:"
+          tar -tf package.tgz
+
+          echo "Checking for built JS files in dist..."
+          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "❌ dist js files missing from tarball" && exit 1)
+
+          echo "✅ dist JS files found in tarball"
+
+      - name: 🔐 Diagnose npm authentication
         run: |
+          echo "Checking whether NPM_AUTH_TOKEN exists..."
+          if [ -z "${NPM_AUTH_TOKEN}" ]; then
+            echo "❌ NPM_AUTH_TOKEN is missing or empty"
+            exit 1
+          fi
+
+          echo "✅ NPM_AUTH_TOKEN is present"
+
+          echo "Setting npm auth token for Yarn..."
           yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
-          yarn npm publish --access public
+
+          echo "Checking npm identity..."
+          yarn npm whoami
+
+          echo "✅ npm authentication succeeded"
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Cleanup
+      - name: 🔎 Check npm package and duplicate version
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Package to publish: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
+
+          echo "Current npm package info:"
+          yarn npm info "${PACKAGE_NAME}" name version dist-tags --json || true
+
+          echo "Checking whether this exact version already exists..."
+          if yarn npm info "${PACKAGE_NAME}@${PACKAGE_VERSION}" version; then
+            echo "❌ Version already exists on npm: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
+            echo "npm versions are immutable. Increase the version before creating the GitHub Release."
+            exit 1
+          fi
+
+          echo "✅ Version does not exist yet"
+
+      - name: 🚢 Publish release to npm latest tag
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          echo "Publishing ${PACKAGE_NAME}@${PACKAGE_VERSION} with npm default/latest tag"
+
+          yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
+          yarn npm publish --access public
+
+          echo "✅ Publish command completed"
+
+          echo "Checking npm dist-tags after publish:"
+          yarn npm info "${PACKAGE_NAME}" dist-tags --json || true
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: 🧹 Cleanup
         if: always()
         run: rm -f package.tgz
