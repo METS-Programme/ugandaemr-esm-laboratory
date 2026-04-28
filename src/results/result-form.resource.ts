@@ -1,10 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { validateObservationPayload as validateObs } from './result-form-validation.utils';
-import {
-  ObservationListPayload,
-  OrderDiscontinuationPayload,
-} from '../types/laboratory.types';
+import { ObservationListPayload, OrderDiscontinuationPayload } from '../types/laboratory.types';
 
 export interface ConceptResponse {
   uuid: string;
@@ -334,10 +331,7 @@ export function useGetOrderConceptByUuid(uuid: string) {
   };
 }
 
-export async function UpdateEncounter(
-  uuid: string,
-  payload: ObservationListPayload
-) {
+export async function UpdateEncounter(uuid: string, payload: ObservationListPayload) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/encounter/${uuid}`, {
     method: 'POST',
@@ -389,7 +383,7 @@ async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: 
     console.error('Failed to rollback order:', error);
     return {
       success: false,
-      error: `Rollback failed: ${error.message}`
+      error: `Rollback failed: ${error.message}`,
     };
   }
 }
@@ -406,7 +400,7 @@ async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: 
 export async function UpdateOrderResult(
   encounterUuid: string,
   obsPayload: ObservationListPayload,
-  orderPayload: OrderDiscontinuationPayload
+  orderPayload: OrderDiscontinuationPayload,
 ): Promise<TransactionResult> {
   const abortController = new AbortController();
 
@@ -418,7 +412,7 @@ export async function UpdateOrderResult(
         success: false,
         error: validation.error,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -438,7 +432,7 @@ export async function UpdateOrderResult(
         success: false,
         error: `Order update failed: ${orderError.message}`,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -451,7 +445,7 @@ export async function UpdateOrderResult(
         success: false,
         error: `Order update failed: ${errorMessage}`,
         orderUpdated: false,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -475,9 +469,11 @@ export async function UpdateOrderResult(
 
       return {
         success: false,
-        error: `Observation save failed: ${obsError.message}. ${rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'}`,
+        error: `Observation save failed: ${obsError.message}. ${
+          rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'
+        }`,
         orderUpdated: true,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -489,9 +485,11 @@ export async function UpdateOrderResult(
 
       return {
         success: false,
-        error: `Observation save failed: ${errorMessage}. ${rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'}`,
+        error: `Observation save failed: ${errorMessage}. ${
+          rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'
+        }`,
         orderUpdated: true,
-        observationSaved: false
+        observationSaved: false,
       };
     }
 
@@ -499,9 +497,8 @@ export async function UpdateOrderResult(
     return {
       success: true,
       orderUpdated: true,
-      observationSaved: true
+      observationSaved: true,
     };
-
   } catch (error) {
     // Unexpected error
     console.error('Unexpected error in UpdateOrderResult:', error);
@@ -509,7 +506,7 @@ export async function UpdateOrderResult(
       success: false,
       error: `Unexpected error: ${error.message}`,
       orderUpdated: false,
-      observationSaved: false
+      observationSaved: false,
     };
   }
 }

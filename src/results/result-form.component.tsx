@@ -3,16 +3,8 @@ import styles from './result-form.scss';
 import { Button, InlineLoading, ModalBody, ModalFooter } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { closeOverlay } from '../components/overlay/hook';
-import {
-  ExtensionSlot,
-  showNotification,
-  showSnackbar,
-  usePatient,
-} from '@openmrs/esm-framework';
-import {
-  useGetOrderConceptByUuid,
-  UpdateOrderResult,
-} from './result-form.resource';
+import { ExtensionSlot, showNotification, showSnackbar, usePatient } from '@openmrs/esm-framework';
+import { useGetOrderConceptByUuid, UpdateOrderResult } from './result-form.resource';
 import { Result } from '../work-list/work-list.resource';
 import ResultFormField from './result-form-field.component';
 import { useForm } from 'react-hook-form';
@@ -77,10 +69,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
       let groupMembers = [];
       concept.setMembers.forEach((member) => {
         let value;
-        if (
-          member.datatype.display === 'Numeric' ||
-          member.datatype.display === 'Text'
-        ) {
+        if (member.datatype.display === 'Numeric' || member.datatype.display === 'Text') {
           value = getValues()[`${member.uuid}`];
         } else if (member.datatype.display === 'Coded') {
           value = {
@@ -112,10 +101,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
     } else if (!concept.set && concept.setMembers.length === 0) {
       // Handle individual tests - only include if value exists
       let value;
-      if (
-        concept.datatype.display === 'Numeric' ||
-        concept.datatype.display === 'Text'
-      ) {
+      if (concept.datatype.display === 'Numeric' || concept.datatype.display === 'Text') {
         value = getValues()[`${concept.uuid}`];
       } else if (concept.datatype.display === 'Coded') {
         value = {
@@ -140,10 +126,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
         title: t('noResults', 'No Results to Save'),
         kind: 'error',
         critical: false,
-        description: t(
-          'noResultsError',
-          'Please provide at least one test result before saving.'
-        ),
+        description: t('noResultsError', 'Please provide at least one test result before saving.'),
       });
       return;
     }
@@ -163,21 +146,14 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
       orderer: order.orderer.uuid,
     };
 
-    UpdateOrderResult(
-      order.encounter.uuid,
-      obsPayload,
-      orderDiscontinuationPayload
-    ).then(
+    UpdateOrderResult(order.encounter.uuid, obsPayload, orderDiscontinuationPayload).then(
       (result) => {
         if (result.success) {
           showSnackbar({
             isLowContrast: true,
             title: t('updateEncounter', 'Update lab results'),
             kind: 'success',
-            subtitle: t(
-              'generateSuccessfully',
-              'You have successfully updated test results'
-            ),
+            subtitle: t('generateSuccessfully', 'You have successfully updated test results'),
           });
           closeOverlay();
         } else {
@@ -185,10 +161,7 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
           const errorMessage = result.error || t('unexpectedError', 'An unexpected error occurred');
 
           showNotification({
-            title: t(
-              'errorUpdatingEncounter',
-              'Error occurred while updating test results'
-            ),
+            title: t('errorUpdatingEncounter', 'Error occurred while updating test results'),
             kind: 'error',
             critical: true,
             description: errorMessage,
@@ -198,15 +171,12 @@ const ResultForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
       (err) => {
         // Handle unexpected errors
         showNotification({
-          title: t(
-            'errorUpdatingEncounter',
-            'Error occurred while updating test results'
-          ),
+          title: t('errorUpdatingEncounter', 'Error occurred while updating test results'),
           kind: 'error',
           critical: true,
           description: err?.message || t('unexpectedError', 'An unexpected error occurred'),
         });
-      }
+      },
     );
   };
   return (
