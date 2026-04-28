@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -34,30 +34,30 @@ jobs:
           corepack enable
           corepack prepare yarn@4.9.2 --activate
 
-      - name: Cache dependencies
+      - name: 💾 Cache dependencies
         id: cache
         uses: actions/cache@v4
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: Setup local cache server for Turborepo
+      - name: 🚀 Setup Turborepo cache
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: Verify
+      - name: ✅ Verify
         run: yarn verify
 
-      - name: Build
+      - name: 🛠️ Build
         run: yarn turbo run build --color --concurrency=5
 
-      - name: Upload Artifacts
+      - name: 📤 Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -67,15 +67,15 @@ jobs:
   pre_release:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Artifacts
+      - name: 📥 Download Artifacts
         uses: actions/download-artifact@v4
 
-      - name: Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -86,53 +86,51 @@ jobs:
           corepack enable
           corepack prepare yarn@4.9.2 --activate
 
-      - name: Cache dependencies
+      - name: 💾 Cache dependencies
         id: cache
         uses: actions/cache@v4
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: Setup local cache server for Turborepo
+      - name: 🚀 Setup Turborepo cache
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: Version
-        run: yarn version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+      - name: 🏷️ Version (unique prerelease)
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          BASE_VERSION=$(node -e "const semver=require('semver'); console.log(semver.inc('$CURRENT_VERSION', 'patch'))")
+          NEW_VERSION="${BASE_VERSION}-pre.${{ github.run_number }}"
+          echo "Publishing version: ${NEW_VERSION}"
+          yarn version "${NEW_VERSION}"
 
-      - name: Build
+      - name: 🛠️ Build
         run: yarn turbo run build --color --concurrency=5
 
-      - name: Verify package contains routes.json
+      - name: ✅ Verify package contains dist JS
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/routes.json$' || (echo "root routes.json missing from tarball" && exit 1)
+          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "dist js files missing from tarball" && exit 1)
 
-      - name: Commit prerelease version
-        run: |
-          git config user.email "<>"
-          git config user.name "UgandaEMR CI"
-          git add .
-          git commit -m "Prerelease version" --no-verify
-
-      - name: Publish prerelease
+      - name: 🚢 Publish prerelease
         run: |
           yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
           yarn npm publish --access public --tag next
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Cleanup tarball
+      - name: Cleanup
         if: always()
         run: rm -f package.tgz
 
-      - name: Upload Artifacts
+      - name: 📤 Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -147,10 +145,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Artifacts
+      - name: 📥 Download Artifacts
         uses: actions/download-artifact@v4
 
-      - name: Use Node.js
+      - name: 🟢 Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -161,32 +159,32 @@ jobs:
           corepack enable
           corepack prepare yarn@4.9.2 --activate
 
-      - name: Cache dependencies
+      - name: 💾 Cache dependencies
         id: cache
         uses: actions/cache@v4
         with:
           path: "**/node_modules"
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - name: Build
+      - name: 🛠️ Build
         run: yarn turbo run build --color
 
-      - name: Verify package contains routes.json
+      - name: ✅ Verify package contains dist JS
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/routes.json$' || (echo "root routes.json missing from tarball" && exit 1)
+          tar -tf package.tgz | grep -E '^package/dist/.+\.js$' || (echo "dist js files missing from tarball" && exit 1)
 
-      - name: Publish
+      - name: 🚢 Publish release
         run: |
           yarn config set npmAuthToken "${NPM_AUTH_TOKEN}"
           yarn npm publish --access public
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Cleanup tarball
+      - name: Cleanup
         if: always()
         run: rm -f package.tgz
