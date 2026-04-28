@@ -191,7 +191,7 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: 🔎 Check npm package and duplicate version
+      - name: 🔎 Check npm package and version safely
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
@@ -199,16 +199,35 @@ jobs:
           echo "Package to publish: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
 
           echo "Current npm package info:"
-          yarn npm info "${PACKAGE_NAME}" name version dist-tags --json || true
+          yarn npm info "${PACKAGE_NAME}" --json || true
 
           echo "Checking whether this exact version already exists..."
-          if yarn npm info "${PACKAGE_NAME}@${PACKAGE_VERSION}" version; then
+          EXISTING_VERSIONS=$(yarn npm info "${PACKAGE_NAME}" versions --json | node -e "
+            let input = '';
+            process.stdin.on('data', chunk => input += chunk);
+            process.stdin.on('end', () => {
+              try {
+                const data = JSON.parse(input);
+                const versions = Array.isArray(data) ? data : data.versions || [];
+                console.log(versions.join('\n'));
+              } catch (e) {
+                console.error('Could not parse npm versions response');
+                console.error(input);
+                process.exit(1);
+              }
+            });
+          ")
+
+          echo "Existing versions:"
+          echo "${EXISTING_VERSIONS}"
+
+          if echo "${EXISTING_VERSIONS}" | grep -Fxq "${PACKAGE_VERSION}"; then
             echo "❌ Version already exists on npm: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
             echo "npm versions are immutable. Increase the version or use a different prerelease number."
             exit 1
           fi
 
-          echo "✅ Version does not exist yet"
+          echo "✅ Version does not exist yet. Safe to publish."
 
       - name: 🚢 Publish prerelease to npm next tag
         run: |
@@ -333,7 +352,7 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: 🔎 Check npm package and duplicate version
+      - name: 🔎 Check npm package and version safely
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
@@ -341,16 +360,35 @@ jobs:
           echo "Package to publish: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
 
           echo "Current npm package info:"
-          yarn npm info "${PACKAGE_NAME}" name version dist-tags --json || true
+          yarn npm info "${PACKAGE_NAME}" --json || true
 
           echo "Checking whether this exact version already exists..."
-          if yarn npm info "${PACKAGE_NAME}@${PACKAGE_VERSION}" version; then
+          EXISTING_VERSIONS=$(yarn npm info "${PACKAGE_NAME}" versions --json | node -e "
+            let input = '';
+            process.stdin.on('data', chunk => input += chunk);
+            process.stdin.on('end', () => {
+              try {
+                const data = JSON.parse(input);
+                const versions = Array.isArray(data) ? data : data.versions || [];
+                console.log(versions.join('\n'));
+              } catch (e) {
+                console.error('Could not parse npm versions response');
+                console.error(input);
+                process.exit(1);
+              }
+            });
+          ")
+
+          echo "Existing versions:"
+          echo "${EXISTING_VERSIONS}"
+
+          if echo "${EXISTING_VERSIONS}" | grep -Fxq "${PACKAGE_VERSION}"; then
             echo "❌ Version already exists on npm: ${PACKAGE_NAME}@${PACKAGE_VERSION}"
             echo "npm versions are immutable. Increase the version before creating the GitHub Release."
             exit 1
           fi
 
-          echo "✅ Version does not exist yet"
+          echo "✅ Version does not exist yet. Safe to publish."
 
       - name: 🚢 Publish release to npm latest tag
         run: |
