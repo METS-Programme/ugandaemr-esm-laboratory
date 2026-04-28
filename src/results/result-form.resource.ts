@@ -1,5 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { validateObservationPayload as validateObs } from './result-form-validation.utils';
+import { ObservationListPayload, OrderDiscontinuationPayload } from '../types/laboratory.types';
 
 export interface ConceptResponse {
   uuid: string;
@@ -329,7 +331,7 @@ export function useGetOrderConceptByUuid(uuid: string) {
   };
 }
 
-export async function UpdateEncounter(uuid: string, payload: any) {
+export async function UpdateEncounter(uuid: string, payload: ObservationListPayload) {
   const abortController = new AbortController();
   return openmrsFetch(`${restBaseUrl}/encounter/${uuid}`, {
     method: 'POST',
@@ -342,27 +344,169 @@ export async function UpdateEncounter(uuid: string, payload: any) {
 }
 
 //TODO: the calls to update order and observations for results should be transactional to allow for rollback
-export async function UpdateOrderResult(encounterUuid: string, obsPayload: any, orderPayload: any) {
-  const abortController = new AbortController();
-  const updateOrderCall = await openmrsFetch(`${restBaseUrl}/order`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    signal: abortController.signal,
-    body: orderPayload,
-  });
+/**
+ * Transactional result saving with automatic rollback on failure
+ * Ensures data consistency between order updates and observation saves
+ */
 
-  if (updateOrderCall.status === 201) {
-    return await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      signal: abortController.signal,
-      body: obsPayload,
-    });
-  } else {
-    // handle errors
+export interface TransactionResult {
+  success: boolean;
+  error?: string;
+  orderUpdated?: boolean;
+  observationSaved?: boolean;
+}
+
+/**
+ * Rolls back a discontinued order by voiding it
+ * This is used when observation save fails after order discontinuation
+ */
+async function rollbackDiscontinuedOrder(orderUuid: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Check if this is actually a discontinued order
+    const orderResponse = await openmrsFetch(`${restBaseUrl}/order/${orderUuid}`);
+
+    if (orderResponse.ok) {
+      const orderData = await orderResponse.json();
+      // Only rollback if the order was actually stopped/discontinued
+      if (orderData.stopped || orderData.dateStopped) {
+        // Void the discontinuation action
+        await openmrsFetch(`${restBaseUrl}/order/${orderUuid}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        return { success: true };
+      }
+    }
+
+    return { success: true }; // Order wasn't discontinued, no rollback needed
+  } catch (error) {
+    console.error('Failed to rollback order:', error);
+    return {
+      success: false,
+      error: `Rollback failed: ${error.message}`,
+    };
+  }
+}
+
+/**
+ * Transactional update of order and observation with automatic rollback
+ * If observation save fails after order discontinuation, the order is automatically reinstated
+ *
+ * @param encounterUuid - The encounter UUID for saving observations
+ * @param obsPayload - The observation payload to save
+ * @param orderPayload - The order discontinuation payload
+ * @returns TransactionResult with success status and error details
+ */
+export async function UpdateOrderResult(
+  encounterUuid: string,
+  obsPayload: ObservationListPayload,
+  orderPayload: OrderDiscontinuationPayload,
+): Promise<TransactionResult> {
+  const abortController = new AbortController();
+
+  try {
+    // Step 1: Validate observation payload first
+    const validation = await validateObs(obsPayload as unknown as Record<string, unknown>);
+    if (!validation.valid) {
+      return {
+        success: false,
+        error: validation.error,
+        orderUpdated: false,
+        observationSaved: false,
+      };
+    }
+
+    // Step 2: Update the order (discontinue previous order)
+    let orderUpdateResponse;
+    try {
+      orderUpdateResponse = await openmrsFetch(`${restBaseUrl}/order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: abortController.signal,
+        body: orderPayload,
+      });
+    } catch (orderError) {
+      return {
+        success: false,
+        error: `Order update failed: ${orderError.message}`,
+        orderUpdated: false,
+        observationSaved: false,
+      };
+    }
+
+    if (orderUpdateResponse.status !== 201) {
+      // Order update failed - no need to rollback since nothing changed
+      const errorData = orderUpdateResponse.data?.error || {};
+      const errorMessage = errorData.message || 'Order update failed';
+
+      return {
+        success: false,
+        error: `Order update failed: ${errorMessage}`,
+        orderUpdated: false,
+        observationSaved: false,
+      };
+    }
+
+    // Order was successfully updated
+    const previousOrderUuid = orderPayload.previousOrder;
+
+    // Step 3: Save the observations
+    let obsResponse;
+    try {
+      obsResponse = await openmrsFetch(`${restBaseUrl}/encounter/${encounterUuid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: abortController.signal,
+        body: obsPayload,
+      });
+    } catch (obsError) {
+      // Observation save failed - rollback the order
+      const rollback = await rollbackDiscontinuedOrder(previousOrderUuid);
+
+      return {
+        success: false,
+        error: `Observation save failed: ${obsError.message}. ${
+          rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'
+        }`,
+        orderUpdated: true,
+        observationSaved: false,
+      };
+    }
+
+    if (!obsResponse.ok) {
+      // Observation save returned error status - rollback the order
+      const errorData = obsResponse.data?.error || {};
+      const errorMessage = errorData.message || 'Observation save failed';
+      const rollback = await rollbackDiscontinuedOrder(previousOrderUuid);
+
+      return {
+        success: false,
+        error: `Observation save failed: ${errorMessage}. ${
+          rollback.success ? 'Order has been rolled back.' : 'Order rollback failed - manual intervention required.'
+        }`,
+        orderUpdated: true,
+        observationSaved: false,
+      };
+    }
+
+    // Success! Both order and observations were saved
+    return {
+      success: true,
+      orderUpdated: true,
+      observationSaved: true,
+    };
+  } catch (error) {
+    // Unexpected error
+    console.error('Unexpected error in UpdateOrderResult:', error);
+    return {
+      success: false,
+      error: `Unexpected error: ${error.message}`,
+      orderUpdated: false,
+      observationSaved: false,
+    };
   }
 }
