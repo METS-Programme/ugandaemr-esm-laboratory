@@ -111,7 +111,7 @@ jobs:
       - name: ✅ Verify package contains routes.json
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/routes.json$' || (echo "root routes.json missing from tarball" && exit 1)
+          tar -tf package.tgz | grep -E '^package/dist/routes.json$' || (echo "routes.json missing from dist directory" && exit 1)
 
       - name: Commit prerelease version
         run: |
@@ -178,7 +178,7 @@ jobs:
       - name: ✅ Verify package contains routes.json
         run: |
           yarn pack --out package.tgz
-          tar -tf package.tgz | grep -E '^package/routes.json$' || (echo "root routes.json missing from tarball" && exit 1)
+          tar -tf package.tgz | grep -E '^package/dist/routes.json$' || (echo "routes.json missing from dist directory" && exit 1)
 
       - name: 🚢 Publish
         run: |

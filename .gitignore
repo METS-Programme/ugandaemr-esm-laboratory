@@ -68,7 +68,9 @@ dist/
 # Intellij integration
 *.iml
 *.idea/
-*.claude/
+
+# Claude Code
+.claude/
 # ignores for Yarn v3 w/o PNP
 .pnp.*
 .yarn/*
